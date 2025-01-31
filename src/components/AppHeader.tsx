@@ -11,7 +11,7 @@ import { Login, Logout, PersonAdd, Settings } from "@mui/icons-material";
 
 export default function ButtonAppBar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Replace with actual login state
+  const [isLoggedIn /*setIsLoggedIn*/] = useState(false);
   const open = Boolean(anchorEl);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
