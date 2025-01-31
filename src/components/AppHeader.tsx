@@ -7,21 +7,28 @@ import { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Avatar, Divider, ListItemIcon, Typography } from "@mui/material";
-import { Login, Logout, PersonAdd, Settings } from "@mui/icons-material";
+import { Login, Logout, Settings } from "@mui/icons-material";
 
 interface ButtaonAppBarProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
   setIsOpen,
   isLoggedIn,
+  setIsLoggedIn,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    handleClose();
   };
 
   const handleClose = () => {
@@ -69,14 +76,13 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
             {isLoggedIn ? (
               <>
                 <IconButton
-                  size="large"
                   aria-label="account of current user"
                   aria-controls="menu-appbar"
                   aria-haspopup="true"
                   onClick={handleMenu}
                   color="inherit"
                 >
-                  <AccountCircle />
+                  <AccountCircle fontSize="large" />
                 </IconButton>
                 <Menu
                   anchorEl={anchorEl}
@@ -124,17 +130,11 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
                   <Divider />
                   <MenuItem onClick={handleClose}>
                     <ListItemIcon>
-                      <PersonAdd fontSize="small" />
-                    </ListItemIcon>
-                    Add another account
-                  </MenuItem>
-                  <MenuItem onClick={handleClose}>
-                    <ListItemIcon>
                       <Settings fontSize="small" />
                     </ListItemIcon>
                     Settings
                   </MenuItem>
-                  <MenuItem onClick={handleClose}>
+                  <MenuItem onClick={handleLogout}>
                     <ListItemIcon>
                       <Logout fontSize="small" />
                     </ListItemIcon>

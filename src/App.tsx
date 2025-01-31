@@ -43,7 +43,11 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <AppHeader setIsOpen={setIsOpen} isLoggedIn={isLoggedIn} />
+        <AppHeader
+          setIsOpen={setIsOpen}
+          setIsLoggedIn={setIsLoggedIn}
+          isLoggedIn={isLoggedIn}
+        />
         <Login
           isOpen={isOpen}
           setIsOpen={setIsOpen}
