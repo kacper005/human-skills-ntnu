@@ -23,7 +23,8 @@ const darkTheme = createTheme({
       main: "#EC733D",
     },
     background: {
-      default: "#1a1a1a",
+      default: "#2E2F30",
+      paper: "#28292C",
     },
   },
 });
@@ -46,7 +47,7 @@ const lightTheme = createTheme({
 function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   return (
     <ThemeProvider
