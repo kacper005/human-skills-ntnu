@@ -15,7 +15,16 @@ const GameCard: React.FC<GameCardProps> = ({
   difficulty,
 }) => {
   return (
-    <Card elevation={0}>
+    <Card
+      elevation={0}
+      sx={{
+        transition: "transform 0.3s, box-shadow 0.3s",
+        "&:hover": {
+          transform: "scale(1.01)",
+          boxShadow: 3,
+        },
+      }}
+    >
       <CardContent>
         <Typography
           gutterBottom
