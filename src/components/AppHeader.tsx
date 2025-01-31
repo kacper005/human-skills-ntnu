@@ -8,7 +8,7 @@ import { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Avatar, Divider, ListItemIcon, Typography } from "@mui/material";
-import { Logout, PersonAdd, Settings } from "@mui/icons-material";
+import { Login, Logout, PersonAdd, Settings } from "@mui/icons-material";
 
 export default function ButtonAppBar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -22,7 +22,14 @@ export default function ButtonAppBar() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, textAlign: "center" }}>
+    <Box
+      sx={{ flexGrow: 1, textAlign: "center" }}
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      height="5vh"
+    >
       <AppBar position="fixed">
         <Toolbar>
           <IconButton
@@ -34,7 +41,12 @@ export default function ButtonAppBar() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography sx={{ flexGrow: 1 }}>
+          <Typography
+            sx={{ flexGrow: 1 }}
+            component="a"
+            href="/home"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
             <img src="/talection.png" alt="Talection" style={{ height: 24 }} />
           </Typography>
           <div>
@@ -103,6 +115,17 @@ export default function ButtonAppBar() {
                   <Settings fontSize="small" />
                 </ListItemIcon>
                 Settings
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  window.location.href = "/login";
+                }}
+              >
+                <ListItemIcon>
+                  <Login fontSize="small" />
+                </ListItemIcon>
+                Login
               </MenuItem>
               <MenuItem onClick={handleClose}>
                 <ListItemIcon>

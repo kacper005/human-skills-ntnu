@@ -9,6 +9,8 @@ import "./App.css";
 import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
 import GameCardGrid from "./components/GameCardGrid";
 import Game from "./components/Game";
+import Login from "./components/Login";
+import Home from "./components/Home";
 
 const theme = createTheme({
   colorSchemes: {
@@ -41,8 +43,9 @@ function App() {
         <Offset />
         <Routes>
           <Route path="/" element={<Navigate to="/home" />} />
-          <Route path="/home" element={<GameCardGrid />} />
-          <Route path="/game" element={<Game />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/game/:gameId" element={<Game />} />
           {/* Add more routes here as needed */}
         </Routes>
       </Router>

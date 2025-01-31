@@ -28,7 +28,7 @@ const GameCard: React.FC<GameCardProps> = ({ image, title, description }) => {
           variant="contained"
           color="success"
           style={{ marginTop: "10px" }}
-          onClick={() => (window.location.href = "/game")}
+          onClick={() => (window.location.href = "/game/1")}
         >
           Play
         </Button>

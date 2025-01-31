@@ -66,11 +66,11 @@ const gameData: Game[] = [
 
 import Typography from "@mui/material/Typography";
 
-const GameCardGrid = () => {
+const Quizzes = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Typography variant="h4" component="h2" gutterBottom color="black">
-        Games
+        Quizzes
       </Typography>
       <Grid
         container
@@ -96,4 +96,4 @@ const GameCardGrid = () => {
   );
 };
 
-export default GameCardGrid;
+export default Quizzes;
