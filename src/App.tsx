@@ -38,13 +38,17 @@ const theme = createTheme({
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <AppHeader setIsOpen={setIsOpen} />
-        <Login isOpen={isOpen} setIsOpen={setIsOpen} />
-        {/* <Offset style={{ height: "80px" }} /> */}
+        <AppHeader setIsOpen={setIsOpen} isLoggedIn={isLoggedIn} />
+        <Login
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          setIsLoggedIn={setIsLoggedIn}
+        />
         <div className="app">
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />

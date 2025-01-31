@@ -12,14 +12,14 @@ import {
 interface LoginProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen }) => {
+const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  // const [open, setOpen] = useState(false);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -27,7 +27,9 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen }) => {
       alert("Passwords do not match");
       return;
     }
-    // Handle login or sign up logic here
+
+    setIsOpen(false);
+    setIsLoggedIn(true);
   };
 
   const handleClose = () => {

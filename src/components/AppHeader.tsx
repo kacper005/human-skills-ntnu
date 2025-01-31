@@ -11,11 +11,14 @@ import { Login, Logout, PersonAdd, Settings } from "@mui/icons-material";
 
 interface ButtaonAppBarProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isLoggedIn: boolean;
 }
 
-const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({ setIsOpen }) => {
+const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
+  setIsOpen,
+  isLoggedIn,
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [isLoggedIn /*setIsLoggedIn*/] = useState(false);
   const open = Boolean(anchorEl);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -25,7 +28,7 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({ setIsOpen }) => {
     setAnchorEl(null);
   };
 
-  const handleLogin = () => {
+  const handleLoginModal = () => {
     setIsOpen(true);
   };
 
@@ -143,7 +146,7 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({ setIsOpen }) => {
               <IconButton
                 size="large"
                 aria-label="login"
-                onClick={handleLogin}
+                onClick={handleLoginModal}
                 color="inherit"
                 sx={{ display: "flex", alignItems: "center", borderRadius: 2 }}
               >
