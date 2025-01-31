@@ -9,12 +9,17 @@ import {
   DialogContent,
 } from "@mui/material";
 
-const Login: React.FC = () => {
+interface LoginProps {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -25,27 +30,20 @@ const Login: React.FC = () => {
     // Handle login or sign up logic here
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
   const handleClose = () => {
-    setOpen(false);
+    setIsOpen(false);
+    setIsSignUp(false);
   };
 
   return (
     <Container maxWidth="xs">
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        height="50vh"
-      >
-        <Button variant="contained" color="primary" onClick={handleClickOpen}>
-          {isSignUp ? "S342ign Up" : "Login"}
-        </Button>
-        <Dialog open={open} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+        >
           <DialogTitle>{isSignUp ? "Sign Up" : "Login"}</DialogTitle>
           <DialogContent>
             <form onSubmit={handleSubmit}>
@@ -111,8 +109,8 @@ const Login: React.FC = () => {
               </Button>
             </form>
           </DialogContent>
-        </Dialog>
-      </Box>
+        </Box>
+      </Dialog>
     </Container>
   );
 };

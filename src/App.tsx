@@ -10,6 +10,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Game from "./components/Game";
 import Login from "./components/Login";
 import Home from "./components/Home";
+import { useState } from "react";
 
 const theme = createTheme({
   colorSchemes: {
@@ -35,18 +36,18 @@ const theme = createTheme({
   },
 });
 
-// const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
-
 function App() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <AppHeader />
+        <AppHeader setIsOpen={setIsOpen} />
+        <Login isOpen={isOpen} setIsOpen={setIsOpen} />
         {/* <Offset style={{ height: "80px" }} /> */}
         <div className="app">
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
-            <Route path="/login" element={<Login />} />
             <Route path="/home" element={<Home />} />
             <Route path="/game/:gameId" element={<Game />} />
           </Routes>

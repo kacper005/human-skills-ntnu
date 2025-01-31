@@ -9,7 +9,11 @@ import MenuItem from "@mui/material/MenuItem";
 import { Avatar, Divider, ListItemIcon, Typography } from "@mui/material";
 import { Login, Logout, PersonAdd, Settings } from "@mui/icons-material";
 
-export default function ButtonAppBar() {
+interface ButtaonAppBarProps {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({ setIsOpen }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isLoggedIn /*setIsLoggedIn*/] = useState(false);
   const open = Boolean(anchorEl);
@@ -22,8 +26,7 @@ export default function ButtonAppBar() {
   };
 
   const handleLogin = () => {
-    // setIsLoggedIn(true);
-    window.location.href = "/login";
+    setIsOpen(true);
   };
 
   return (
@@ -155,4 +158,6 @@ export default function ButtonAppBar() {
       </AppBar>
     </Box>
   );
-}
+};
+
+export default ButtonAppBar;
