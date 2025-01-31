@@ -50,6 +50,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
           <DialogContent>
             <form onSubmit={handleSubmit}>
               <TextField
+                sx={{ marginTop: 0 }}
                 variant="outlined"
                 margin="normal"
                 required
@@ -94,7 +95,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                color="primary"
+                color="secondary"
                 sx={{ mt: 3, mb: 2 }}
               >
                 {isSignUp ? "Sign Up" : "Login"}

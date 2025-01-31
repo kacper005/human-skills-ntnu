@@ -7,23 +7,38 @@ import { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Avatar, Divider, ListItemIcon, Typography } from "@mui/material";
-import { Login, Logout, Settings } from "@mui/icons-material";
+import {
+  Login,
+  Logout,
+  Settings,
+  DarkMode,
+  LightMode,
+} from "@mui/icons-material";
 
 interface ButtaonAppBarProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  darkMode: boolean;
+  setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
   setIsOpen,
   isLoggedIn,
   setIsLoggedIn,
+  darkMode,
+  setDarkMode,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+    handleClose();
   };
 
   const handleLogout = () => {
@@ -133,6 +148,16 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
                       <Settings fontSize="small" />
                     </ListItemIcon>
                     Settings
+                  </MenuItem>
+                  <MenuItem onClick={handleDarkMode}>
+                    <ListItemIcon>
+                      {darkMode ? (
+                        <LightMode fontSize="small" />
+                      ) : (
+                        <DarkMode fontSize="small" />
+                      )}
+                    </ListItemIcon>
+                    {darkMode ? "Light Mode" : "Dark Mode"}
                   </MenuItem>
                   <MenuItem onClick={handleLogout}>
                     <ListItemIcon>

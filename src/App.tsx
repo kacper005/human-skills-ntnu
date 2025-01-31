@@ -5,6 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import AppHeader from "./components/AppHeader";
+import CssBaseline from "@mui/material/CssBaseline";
 import "./App.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Game from "./components/Game";
@@ -12,41 +13,54 @@ import Login from "./components/Login";
 import Home from "./components/Home";
 import { useState } from "react";
 
-const theme = createTheme({
-  colorSchemes: {
-    light: {
-      palette: {
-        primary: {
-          main: "#FFFFFF",
-        },
-        secondary: {
-          main: "#6F4A7D",
-        },
-        // ...other tokens
-      },
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+    primary: {
+      main: "#E0C2FF",
     },
-    // dark: {
-    //   palette: {
-    //     primary: {
-    //       main: "#E0C2FF",
-    //     },
-    //     // ...other tokens
-    //   },
-    // },
+    secondary: {
+      main: "#EC733D",
+    },
+    background: {
+      default: "#1a1a1a",
+    },
+  },
+});
+
+const lightTheme = createTheme({
+  palette: {
+    mode: "light",
+    primary: {
+      main: "#FFFFFF",
+    },
+    secondary: {
+      main: "#6F4A7D",
+    },
+    background: {
+      default: "#ebebf0",
+    },
   },
 });
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider
+      theme={darkMode ? darkTheme : lightTheme}
+      defaultMode="light"
+    >
+      <CssBaseline />
       <Router>
         <AppHeader
           setIsOpen={setIsOpen}
           setIsLoggedIn={setIsLoggedIn}
           isLoggedIn={isLoggedIn}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
         />
         <Login
           isOpen={isOpen}
