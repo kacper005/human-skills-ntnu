@@ -6,6 +6,8 @@ interface Game {
   id: number;
   title: string;
   description: string;
+  type: string;
+  difficulty: string;
   image: string;
 }
 
@@ -15,6 +17,8 @@ const gameData: Game[] = [
     title: "Attention",
     description:
       "Identify the direction of the central shuttle in a group of space shuttles",
+    type: "attention",
+    difficulty: "easy",
     image: "/game_images/attention.png",
   },
   {
@@ -22,18 +26,41 @@ const gameData: Game[] = [
     title: "Balloon",
     description:
       "Inflate a number of balloons to the maximum to collect as many points as possible",
+    type: "attention",
+    difficulty: "easy",
     image: "/game_images/balloon.png",
   },
   {
     id: 3,
     title: "CogFlex",
     description: "Identify pattern, apply pattern and detect pattern changes.",
+    type: "problem-solving",
+    difficulty: "easy",
     image: "/game_images/cogflex.png",
   },
   {
     id: 4,
     title: "TestyMcTestFace",
     description: "Identify pattern, apply pattern and detect pattern changes.",
+    type: "critical thingking",
+    difficulty: "easy",
+    image: "/game_images/troll.jpg",
+  },
+
+  {
+    id: 5,
+    title: "CogFlex",
+    description: "Identify pattern, apply pattern and detect pattern changes.",
+    type: "problem-solving",
+    difficulty: "easy",
+    image: "/game_images/cogflex.png",
+  },
+  {
+    id: 6,
+    title: "TestyMcTestFace",
+    description: "Identify pattern, apply pattern and detect pattern changes.",
+    type: "critical thingking",
+    difficulty: "easy",
     image: "/game_images/troll.jpg",
   },
   // {
@@ -69,29 +96,21 @@ import Typography from "@mui/material/Typography";
 const GameCardGrid = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Typography
-        variant="h4"
-        gutterBottom
-        color="#6F4A7D"
-        paddingBottom="12px"
-      >
-        Cognitive Games
+      <Typography variant="h4" color="secondary" paddingBottom="24px">
+        <Box sx={{ fontWeight: "bold", m: 1 }}>Cognitive Games</Box>
       </Typography>
       <Grid
         container
-        spacing={{ xs: 2, md: 2 }}
-        columns={{ xs: 2, sm: 8, md: 12 }}
+        spacing={{ xs: 3, sm: 3, md: 3 }}
+        columns={{ xs: 2, sm: 2, md: 8, lg: 12 }}
       >
         {Array.from({ length: gameData.length }).map((_, index) => (
           <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
             <GameCard
               title={gameData[index].title}
-              description={
-                gameData[index].description.split(" ").slice(0, 10).join(" ") +
-                (gameData[index].description.split(" ").length > 10
-                  ? "..."
-                  : "")
-              }
+              description={gameData[index].description}
+              type={gameData[index].type}
+              difficulty={gameData[index].difficulty}
             />
           </Grid>
         ))}

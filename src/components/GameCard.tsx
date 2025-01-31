@@ -4,17 +4,36 @@ import { Card, CardContent, Typography, Button } from "@mui/material";
 interface GameCardProps {
   title: string;
   description: string;
+  type: string;
+  difficulty: string;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ title, description }) => {
+const GameCard: React.FC<GameCardProps> = ({
+  title,
+  description,
+  type,
+  difficulty,
+}) => {
   return (
-    <Card elevation={5}>
+    <Card elevation={0}>
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div" color="#6F4A7D">
+        <Typography
+          gutterBottom
+          variant="h5"
+          fontWeight="bold"
+          component="div"
+          color="secondary"
+        >
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography gutterBottom variant="body1" color="text.secondary">
           {description}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Type: {type}
+        </Typography>
+        <Typography gutterBottom variant="body2" color="text.secondary">
+          Difficulty: {difficulty}
         </Typography>
         <Button
           variant="contained"

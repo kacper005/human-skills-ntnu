@@ -22,14 +22,24 @@ export default function ButtonAppBar() {
 
   return (
     <Box
-      sx={{ flexGrow: 1, textAlign: "center" }}
+      sx={{ flexGrow: 1, textAlign: "center", height: "80px" }}
       display="flex"
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
     >
-      <AppBar position="fixed" elevation={0}>
-        <Toolbar sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{ height: "80px", justifyContent: "center" }}
+      >
+        <Toolbar
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Typography
             sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}
             component="a"

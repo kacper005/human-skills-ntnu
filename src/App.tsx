@@ -42,7 +42,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <Router>
         <AppHeader />
-        <Offset />
+        {/* <Offset style={{ height: "80px" }} /> */}
         <div className="app">
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
