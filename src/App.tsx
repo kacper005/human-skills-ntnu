@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import AppHeader from "./components/AppHeader";
 import "./App.css";
-import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Game from "./components/Game";
 import Login from "./components/Login";
 import Home from "./components/Home";
@@ -35,7 +35,7 @@ const theme = createTheme({
   },
 });
 
-const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
+// const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
 function App() {
   return (
