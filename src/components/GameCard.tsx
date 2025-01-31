@@ -26,7 +26,12 @@ const GameCard: React.FC<GameCardProps> = ({
         >
           {title}
         </Typography>
-        <Typography gutterBottom variant="body1" color="text.secondary">
+        <Typography
+          gutterBottom
+          variant="body1"
+          color="text.secondary"
+          style={{ minHeight: "3em" }}
+        >
           {description}
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -38,10 +43,10 @@ const GameCard: React.FC<GameCardProps> = ({
         <Button
           variant="contained"
           color="secondary"
-          style={{ marginTop: "10px" }}
+          style={{ marginTop: "12px", width: "100%" }}
           onClick={() => (window.location.href = "/game/1")}
         >
-          Play
+          Play Game
         </Button>
       </CardContent>
     </Card>
