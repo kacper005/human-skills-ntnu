@@ -7,7 +7,6 @@ import {
 import AppHeader from "./components/AppHeader";
 import "./App.css";
 import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
-import GameCardGrid from "./components/GameCardGrid";
 import Game from "./components/Game";
 import Login from "./components/Login";
 import Home from "./components/Home";
@@ -17,19 +16,22 @@ const theme = createTheme({
     light: {
       palette: {
         primary: {
-          main: "#FF5733",
+          main: "#FFFFFF",
+        },
+        secondary: {
+          main: "#6F4A7D",
         },
         // ...other tokens
       },
     },
-    dark: {
-      palette: {
-        primary: {
-          main: "#E0C2FF",
-        },
-        // ...other tokens
-      },
-    },
+    // dark: {
+    //   palette: {
+    //     primary: {
+    //       main: "#E0C2FF",
+    //     },
+    //     // ...other tokens
+    //   },
+    // },
   },
 });
 
@@ -41,13 +43,14 @@ function App() {
       <Router>
         <AppHeader />
         <Offset />
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/game/:gameId" element={<Game />} />
-          {/* Add more routes here as needed */}
-        </Routes>
+        <div className="app">
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/game/:gameId" element={<Game />} />
+          </Routes>
+        </div>
       </Router>
     </ThemeProvider>
   );

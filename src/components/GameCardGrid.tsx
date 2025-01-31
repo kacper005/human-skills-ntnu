@@ -69,18 +69,22 @@ import Typography from "@mui/material/Typography";
 const GameCardGrid = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Typography variant="h4" component="h2" gutterBottom color="black">
-        Games
+      <Typography
+        variant="h4"
+        gutterBottom
+        color="#6F4A7D"
+        paddingBottom="12px"
+      >
+        Cognitive Games
       </Typography>
       <Grid
         container
-        spacing={{ xs: 2, md: 3 }}
-        columns={{ xs: 4, sm: 8, md: 12 }}
+        spacing={{ xs: 2, md: 2 }}
+        columns={{ xs: 2, sm: 8, md: 12 }}
       >
         {Array.from({ length: gameData.length }).map((_, index) => (
           <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
             <GameCard
-              image={gameData[index].image}
               title={gameData[index].title}
               description={
                 gameData[index].description.split(" ").slice(0, 10).join(" ") +

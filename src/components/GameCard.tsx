@@ -1,24 +1,16 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  Button,
-} from "@mui/material";
+import { Card, CardContent, Typography, Button } from "@mui/material";
 
 interface GameCardProps {
-  image: string;
   title: string;
   description: string;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ image, title, description }) => {
+const GameCard: React.FC<GameCardProps> = ({ title, description }) => {
   return (
-    <Card>
-      <CardMedia component="img" height="140" image={image} alt={title} />
+    <Card elevation={5}>
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
+        <Typography gutterBottom variant="h5" component="div" color="#6F4A7D">
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -26,7 +18,7 @@ const GameCard: React.FC<GameCardProps> = ({ image, title, description }) => {
         </Typography>
         <Button
           variant="contained"
-          color="success"
+          color="secondary"
           style={{ marginTop: "10px" }}
           onClick={() => (window.location.href = "/game/1")}
         >

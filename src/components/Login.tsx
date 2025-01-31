@@ -31,7 +31,7 @@ const Login: React.FC = () => {
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
-        height="50vh"
+        minHeight="50vh"
       >
         <Card>
           <CardContent>

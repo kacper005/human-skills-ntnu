@@ -2,7 +2,6 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
 import Menu from "@mui/material/Menu";
@@ -28,27 +27,22 @@ export default function ButtonAppBar() {
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      height="5vh"
     >
-      <AppBar position="fixed">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
+      <AppBar position="fixed" elevation={0}>
+        <Toolbar sx={{ display: "flex", alignItems: "center", height: "100%" }}>
           <Typography
-            sx={{ flexGrow: 1 }}
+            sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}
             component="a"
             href="/home"
-            style={{ textDecoration: "none", color: "inherit" }}
           >
+            <img
+              src="/logo.png"
+              alt="Logo"
+              style={{ height: 32, marginRight: 32 }}
+            />
             <img src="/talection.png" alt="Talection" style={{ height: 24 }} />
           </Typography>
+          <Box sx={{ flexGrow: 1 }} />
           <div>
             <IconButton
               size="large"
