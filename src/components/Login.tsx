@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import {
   TextField,
   Button,
-  Typography,
   Container,
   Box,
-  Card,
-  CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from "@mui/material";
 
 const Login: React.FC = () => {
@@ -14,6 +14,7 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -24,6 +25,14 @@ const Login: React.FC = () => {
     // Handle login or sign up logic here
   };
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <Container maxWidth="xs">
       <Box
@@ -31,13 +40,14 @@ const Login: React.FC = () => {
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
-        minHeight="50vh"
+        height="50vh"
       >
-        <Card>
-          <CardContent>
-            <Typography variant="h4" component="h1" gutterBottom>
-              {isSignUp ? "Sign Up" : "Login"}
-            </Typography>
+        <Button variant="contained" color="primary" onClick={handleClickOpen}>
+          {isSignUp ? "S342ign Up" : "Login"}
+        </Button>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>{isSignUp ? "Sign Up" : "Login"}</DialogTitle>
+          <DialogContent>
             <form onSubmit={handleSubmit}>
               <TextField
                 variant="outlined"
@@ -79,6 +89,7 @@ const Login: React.FC = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               )}
+
               <Button
                 type="submit"
                 fullWidth
@@ -99,8 +110,8 @@ const Login: React.FC = () => {
                   : "Don't have an account? Sign Up"}
               </Button>
             </form>
-          </CardContent>
-        </Card>
+          </DialogContent>
+        </Dialog>
       </Box>
     </Container>
   );
