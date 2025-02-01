@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent, Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface GameCardProps {
   title: string;
@@ -14,6 +15,8 @@ const GameCard: React.FC<GameCardProps> = ({
   type,
   difficulty,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <Card
       elevation={0}
@@ -53,7 +56,7 @@ const GameCard: React.FC<GameCardProps> = ({
           variant="contained"
           color="secondary"
           style={{ marginTop: "12px", width: "100%" }}
-          onClick={() => (window.location.href = "/game/1")}
+          onClick={() => navigate("/game/1")}
         >
           Play Game
         </Button>

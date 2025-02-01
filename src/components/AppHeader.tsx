@@ -14,6 +14,7 @@ import {
   DarkMode,
   LightMode,
 } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 interface ButtaonAppBarProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -76,8 +77,8 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
         >
           <Typography
             sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}
-            component="a"
-            href="/home"
+            component={Link}
+            to="/home"
           >
             <img
               src="/logo.png"
