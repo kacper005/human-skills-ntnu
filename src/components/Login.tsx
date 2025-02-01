@@ -46,11 +46,13 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
           alignItems="center"
           justifyContent="center"
         >
-          <DialogTitle>{isSignUp ? "Sign Up" : "Login"}</DialogTitle>
+          <DialogTitle sx={{ marginTop: 1 }}>
+            {isSignUp ? "Sign Up" : "Login"}
+          </DialogTitle>
           <DialogContent>
             <form onSubmit={handleSubmit}>
               <TextField
-                sx={{ marginTop: 0 }}
+                sx={{ marginTop: 1 }}
                 variant="outlined"
                 margin="normal"
                 required

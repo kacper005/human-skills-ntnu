@@ -42,12 +42,33 @@ const lightTheme = createTheme({
       default: "#ebebf0",
     },
   },
+  components: {
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#6F4A7D",
+          },
+        },
+      },
+    },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          color: "#6F4A7D",
+          "&.Mui-focused": {
+            color: "#6F4A7D",
+          },
+        },
+      },
+    },
+  },
 });
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
   return (
     <ThemeProvider
