@@ -92,30 +92,40 @@ const gameData: Game[] = [
 ];
 
 import Typography from "@mui/material/Typography";
+import GameInfo from "./GameInfo";
+import { useState } from "react";
 
 const GameCardGrid = () => {
+  const [gameModalOpen, setGameModalOpen] = useState(false);
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Typography variant="h4" color="secondary" paddingBottom="24px">
-        <Box sx={{ fontWeight: "bold", m: 1 }}>Cognitive Games</Box>
-      </Typography>
-      <Grid
-        container
-        spacing={{ xs: 3, sm: 3, md: 3 }}
-        columns={{ xs: 2, sm: 2, md: 8, lg: 12 }}
-      >
-        {Array.from({ length: gameData.length }).map((_, index) => (
-          <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
-            <GameCard
-              title={gameData[index].title}
-              description={gameData[index].description}
-              type={gameData[index].type}
-              difficulty={gameData[index].difficulty}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+    <>
+      <GameInfo
+        gameModalOpen={gameModalOpen}
+        setGameModalOpen={setGameModalOpen}
+      />
+      <Box sx={{ flexGrow: 1 }}>
+        <Typography variant="h4" color="secondary" paddingBottom="24px">
+          <Box sx={{ fontWeight: "bold", m: 1 }}>Cognitive Games</Box>
+        </Typography>
+        <Grid
+          container
+          spacing={{ xs: 3, sm: 3, md: 3 }}
+          columns={{ xs: 2, sm: 2, md: 8, lg: 12 }}
+        >
+          {Array.from({ length: gameData.length }).map((_, index) => (
+            <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
+              <GameCard
+                title={gameData[index].title}
+                description={gameData[index].description}
+                type={gameData[index].type}
+                difficulty={gameData[index].difficulty}
+                setGameModalOpen={setGameModalOpen}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </>
   );
 };
 

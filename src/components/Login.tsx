@@ -39,7 +39,15 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
 
   return (
     <Container maxWidth="xs">
-      <Dialog open={isOpen} onClose={handleClose}>
+      <Dialog
+        open={isOpen}
+        onClose={handleClose}
+        PaperProps={{
+          style: {
+            borderRadius: 20,
+          },
+        }}
+      >
         <Box
           display="flex"
           flexDirection="column"

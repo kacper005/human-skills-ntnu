@@ -1,12 +1,13 @@
 import React from "react";
 import { Card, CardContent, Typography, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 interface GameCardProps {
   title: string;
   description: string;
   type: string;
   difficulty: string;
+  setGameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GameCard: React.FC<GameCardProps> = ({
@@ -14,13 +15,15 @@ const GameCard: React.FC<GameCardProps> = ({
   description,
   type,
   difficulty,
+  setGameModalOpen,
 }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <Card
       elevation={0}
       sx={{
+        borderRadius: 5,
         transition: "transform 0.3s, box-shadow 0.3s",
         "&:hover": {
           transform: "scale(1.01)",
@@ -56,7 +59,7 @@ const GameCard: React.FC<GameCardProps> = ({
           variant="contained"
           color="secondary"
           style={{ marginTop: "12px", width: "100%" }}
-          onClick={() => navigate("/game/1")}
+          onClick={() => setGameModalOpen(true)}
         >
           Play Game
         </Button>
