@@ -2,11 +2,13 @@ import React from "react";
 import { Box, Typography, Button, Dialog } from "@mui/material";
 
 interface GameInfoProps {
+  gameInfo: Array<string>;
   gameModalOpen: boolean;
   setGameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GameInfo: React.FC<GameInfoProps> = ({
+  gameInfo,
   gameModalOpen,
   setGameModalOpen,
 }) => {
@@ -38,21 +40,16 @@ const GameInfo: React.FC<GameInfoProps> = ({
           component="div"
           color="secondary"
         >
-          Attention
+          {gameInfo[0]}
         </Typography>
         <Typography sx={{ mt: 2 }}>
-          This is an Attention Game: it records your ability to focus (pay
-          attention) to the right things (ignore everything else).
-        </Typography>
-        <Typography sx={{ mt: 2 }}>
-          Indicate the direction of the space shuttle in the middle (ignore all
-          others - if any). You respond by using "left" or "right" arrow on your
-          keyboard (or using buttons on the screen).
-        </Typography>
-        <Typography sx={{ mt: 2 }}>
-          The game will last for 1 minute; score will be calculated based on
-          number of answers and number of correct answers i.e. a combination of
-          speed and accuracy.
+          {gameInfo[1].split("\n\n").map((line, index) => (
+            <React.Fragment key={index}>
+              {line}
+              <br />
+              <br />
+            </React.Fragment>
+          ))}
         </Typography>
         <Button
           variant="contained"

@@ -7,6 +7,8 @@ interface GameCardProps {
   description: string;
   type: string;
   difficulty: string;
+  descriptionFull: string;
+  setGameInfo: React.Dispatch<React.SetStateAction<string[]>>;
   setGameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -15,9 +17,16 @@ const GameCard: React.FC<GameCardProps> = ({
   description,
   type,
   difficulty,
+  descriptionFull,
+  setGameInfo,
   setGameModalOpen,
 }) => {
   // const navigate = useNavigate();
+
+  const handleGameStart = () => {
+    setGameModalOpen(true);
+    setGameInfo([title, descriptionFull]);
+  }
 
   return (
     <Card
@@ -59,7 +68,7 @@ const GameCard: React.FC<GameCardProps> = ({
           variant="contained"
           color="secondary"
           style={{ marginTop: "12px", width: "100%" }}
-          onClick={() => setGameModalOpen(true)}
+          onClick={handleGameStart}
         >
           Play Game
         </Button>
