@@ -61,12 +61,13 @@ const gameData: Game[] = [
 
   {
     id: 5,
-    title: "ShootyMcFace",
-    description: "Identify pattern, apply pattern and detect pattern changes.",
-    type: "critical thingking",
-    difficulty: "easy",
+    title: "Super Mario",
+    description:
+      "Help Mario as he advertures through Middle Earth to defeat Meta Ridley and save Princess Zelda.",
+    type: "First Person Shooter",
+    difficulty: "Insane",
     image: "/game_images/troll.jpg",
-    descriptionFull: `SHOOTYMCFACE\n\n`,
+    descriptionFull: `RAMPAGE!\n\n`,
   },
 ];
 
