@@ -63,8 +63,8 @@ const gameData: Game[] = [
     id: 5,
     title: "Super Mario",
     description:
-      "Help Mario as he advertures through Middle Earth to defeat Meta Ridley and save Princess Zelda.",
-    type: "First Person Shooter",
+      "Help Mario as he advertures through the Mushroom Kingdom.",
+    type: "Sidescroller",
     difficulty: "Insane",
     image: "/game_images/troll.jpg",
     descriptionFull: `RAMPAGE!\n\n`,
