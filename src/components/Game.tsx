@@ -1,18 +1,22 @@
-const ItchIoGameEmbed = () => {
+import { Card, CardContent, Typography, Box } from "@mui/material";
+
+const GameEmbed = () => {
   return (
-    <div style={{ textAlign: "center" }}>
-      <iframe
-        frameBorder="0"
-        src="https://itch.io/embed/2447355"
-        width="552"
-        height="167"
-      >
-        <a href="https://rosesrot.itch.io/gluttony-gods">
-          Gluttony Gods by rosesrot, Vermillion REX, owl
-        </a>
-      </iframe>
-    </div>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="80vh"
+    >
+      <Card>
+        <CardContent>
+          <Typography variant="h5" component="div">
+            Games in progress...
+          </Typography>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 
-export default ItchIoGameEmbed;
+export default GameEmbed;

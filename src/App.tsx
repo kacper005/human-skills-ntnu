@@ -94,8 +94,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/game/:gameId" element={<Game />} />
             <Route path="/account" element={<UserAccount />} />
+            <Route path="/game" element={<Game />} />
           </Routes>
         </div>
       </Router>
