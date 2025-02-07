@@ -5,6 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import AppHeader from "./components/AppHeader";
+import UserAccount from "./components/UserAccount";
 import CssBaseline from "@mui/material/CssBaseline";
 import "./App.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -94,6 +95,7 @@ function App() {
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/home" element={<Home />} />
             <Route path="/game/:gameId" element={<Game />} />
+            <Route path="/account" element={<UserAccount />} />
           </Routes>
         </div>
       </Router>

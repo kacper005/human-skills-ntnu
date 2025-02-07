@@ -14,6 +14,7 @@ import {
   DarkMode,
   LightMode,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 interface ButtaonAppBarProps {
@@ -33,6 +34,7 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const navigate = useNavigate();
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -54,7 +56,9 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
   const handleLoginModal = () => {
     setIsOpen(true);
   };
-
+  const handleAccount = () => {
+    navigate("/account");
+  };
   return (
     <Box
       sx={{ flexGrow: 1, textAlign: "center", height: "80px" }}
@@ -139,10 +143,11 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
                 >
                   <MenuItem onClick={handleClose}>
                     <Avatar /> Profile
+                    <MenuItem onClick={handleAccount}>
+                      <Avatar /> My account
+                    </MenuItem>
                   </MenuItem>
-                  <MenuItem onClick={handleClose}>
-                    <Avatar /> My account
-                  </MenuItem>
+
                   <Divider />
                   <MenuItem onClick={handleClose}>
                     <ListItemIcon>
