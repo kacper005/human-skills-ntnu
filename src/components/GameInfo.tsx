@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography, Button, Dialog } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface GameInfoProps {
   gameInfo: Array<string>;
@@ -12,7 +13,10 @@ const GameInfo: React.FC<GameInfoProps> = ({
   gameModalOpen,
   setGameModalOpen,
 }) => {
-  const handleClose = () => setGameModalOpen(false);
+  const handleClose = () => {
+    setGameModalOpen(false);
+  };
+  const navigate = useNavigate();
 
   return (
     <Dialog
@@ -54,7 +58,10 @@ const GameInfo: React.FC<GameInfoProps> = ({
         <Button
           variant="contained"
           color="primary"
-          onClick={handleClose}
+          onClick={() => {
+            handleClose();
+            navigate("/game");
+          }}
           sx={{ mt: 3 }}
         >
           Start
