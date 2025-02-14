@@ -143,9 +143,9 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
                 >
                   <MenuItem onClick={handleClose}>
                     <Avatar /> Profile
-                    <MenuItem onClick={handleAccount}>
-                      <Avatar /> My account
-                    </MenuItem>
+                  </MenuItem>
+                  <MenuItem onClick={handleAccount}>
+                    <Avatar /> My account
                   </MenuItem>
 
                   <Divider />
