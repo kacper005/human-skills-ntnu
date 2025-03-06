@@ -12,6 +12,7 @@ import Game from "./components/Game";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import { useState } from "react";
+import Questionnaire from "./components/Questionnaire";
 
 const darkTheme = createTheme({
   palette: {
@@ -94,6 +95,7 @@ function App() {
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/home" element={<Home />} />
             <Route path="/game" element={<Game />} />
+            <Route path="/test" element={<Questionnaire />} />
           </Routes>
         </div>
       </Router>

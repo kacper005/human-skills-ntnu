@@ -58,12 +58,10 @@ const gameData: Game[] = [
     image: "/game_images/troll.jpg",
     descriptionFull: `This is a TestyMcTestFace Game: it records your ability to test, mcFace and face the TestFace.\n\nPress on the the correct face option (out of 4 at the top) that matches the McTestFace - following the identified McFace (color of the Test, number of Testy's MCface or shape of McFace); pattern will at irregular intervals change.\n\nThe game will last for 2 minutes; score will be calculated based on number of answers and number of correct answers i.e. a combination of speed and accuracy.\n\n`,
   },
-
   {
     id: 5,
     title: "Super Mario",
-    description:
-      "Help Mario as he advertures through the Mushroom Kingdom.",
+    description: "Help Mario as he advertures through the Mushroom Kingdom.",
     type: "Sidescroller",
     difficulty: "Insane",
     image: "/game_images/troll.jpg",
