@@ -10,6 +10,28 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  maxWidth: 500,
+  margin: "auto",
+  marginTop: theme.spacing(5),
+  padding: theme.spacing(3),
+  boxShadow: theme.shadows[3],
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  fontWeight: theme.typography.button.fontWeight,
+  borderRadius: theme.shape.borderRadius,
+}));
+
+const DeleteButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.error.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: theme.palette.error.dark,
+  },
+}));
 
 const UserAccount: React.FC = () => {
   const [email, setEmail] = useState("user@example.com");
@@ -33,9 +55,9 @@ const UserAccount: React.FC = () => {
   };
 
   return (
-    <Card sx={{ maxWidth: 500, margin: "auto", mt: 5, p: 3 }}>
+    <StyledCard>
       <CardContent>
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h4" gutterBottom>
           Manage Account
         </Typography>
         <TextField
@@ -53,25 +75,25 @@ const UserAccount: React.FC = () => {
           fullWidth
           margin="normal"
         />
-        <Button
+        <StyledButton
           variant="contained"
           color="primary"
           fullWidth
           onClick={handleUpdate}
         >
           Update Account
-        </Button>
-        <Button
+        </StyledButton>
+        <DeleteButton
           variant="contained"
-          color="error"
           fullWidth
           sx={{ mt: 2 }}
           onClick={() => setOpenDeleteDialog(true)}
         >
           Delete Account
-        </Button>
+        </DeleteButton>
       </CardContent>
 
+      {/* Delete Confirmation Dialog */}
       <Dialog
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
@@ -87,12 +109,10 @@ const UserAccount: React.FC = () => {
           <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleDeleteAccount} color="error">
-            Delete
-          </Button>
+          <DeleteButton onClick={handleDeleteAccount}>Delete</DeleteButton>
         </DialogActions>
       </Dialog>
-    </Card>
+    </StyledCard>
   );
 };
 

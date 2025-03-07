@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Button, Dialog } from "@mui/material";
+import { Box, Typography, Button, Dialog, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 interface GameInfoProps {
@@ -13,10 +13,12 @@ const GameInfo: React.FC<GameInfoProps> = ({
   gameModalOpen,
   setGameModalOpen,
 }) => {
+  const theme = useTheme();
+  const navigate = useNavigate();
+
   const handleClose = () => {
     setGameModalOpen(false);
   };
-  const navigate = useNavigate();
 
   return (
     <Dialog
@@ -27,6 +29,8 @@ const GameInfo: React.FC<GameInfoProps> = ({
       PaperProps={{
         style: {
           borderRadius: 20,
+          backgroundColor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
         },
       }}
     >
@@ -46,7 +50,7 @@ const GameInfo: React.FC<GameInfoProps> = ({
         >
           {gameInfo[0]}
         </Typography>
-        <Typography sx={{ mt: 2 }}>
+        <Typography sx={{ mt: 2, color: theme.palette.text.secondary }}>
           {gameInfo[1].split("\n\n").map((line, index) => (
             <React.Fragment key={index}>
               {line}
@@ -57,12 +61,23 @@ const GameInfo: React.FC<GameInfoProps> = ({
         </Typography>
         <Button
           variant="contained"
-          color="primary"
+          sx={{
+            mt: 3,
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? theme.palette.primary.dark
+                : theme.palette.primary.main,
+            "&:hover": {
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? theme.palette.primary.light
+                  : theme.palette.primary.dark,
+            },
+          }}
           onClick={() => {
             handleClose();
             navigate("/game");
           }}
-          sx={{ mt: 3 }}
         >
           Start
         </Button>

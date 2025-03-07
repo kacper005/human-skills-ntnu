@@ -1,6 +1,5 @@
 import React from "react";
-import { Card, CardContent, Typography, Button } from "@mui/material";
-// import { useNavigate } from "react-router-dom";
+import { Card, CardContent, Typography, Button, useTheme } from "@mui/material";
 
 interface GameCardProps {
   title: string;
@@ -21,22 +20,24 @@ const GameCard: React.FC<GameCardProps> = ({
   setGameInfo,
   setGameModalOpen,
 }) => {
-  // const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleGameStart = () => {
     setGameModalOpen(true);
     setGameInfo([title, descriptionFull]);
-  }
+  };
 
   return (
     <Card
-      elevation={0}
+      elevation={theme.palette.mode === "dark" ? 2 : 0}
       sx={{
         borderRadius: 5,
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
         transition: "transform 0.3s, box-shadow 0.3s",
         "&:hover": {
           transform: "scale(1.01)",
-          boxShadow: 3,
+          boxShadow: theme.shadows[3],
         },
       }}
     >
@@ -54,7 +55,7 @@ const GameCard: React.FC<GameCardProps> = ({
           gutterBottom
           variant="body1"
           color="text.secondary"
-          style={{ minHeight: "3em" }}
+          sx={{ minHeight: "3em" }}
         >
           {description}
         </Typography>
@@ -67,7 +68,20 @@ const GameCard: React.FC<GameCardProps> = ({
         <Button
           variant="contained"
           color="secondary"
-          style={{ marginTop: "12px", width: "100%" }}
+          sx={{
+            marginTop: "12px",
+            width: "100%",
+            backgroundColor:
+              theme.palette.mode === "dark"
+                ? theme.palette.secondary.dark
+                : theme.palette.secondary.main,
+            "&:hover": {
+              backgroundColor:
+                theme.palette.mode === "dark"
+                  ? theme.palette.secondary.light
+                  : theme.palette.secondary.dark,
+            },
+          }}
           onClick={handleGameStart}
         >
           Play Game

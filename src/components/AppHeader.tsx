@@ -17,7 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-interface ButtaonAppBarProps {
+interface ButtonAppBarProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,7 +25,7 @@ interface ButtaonAppBarProps {
   setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
+const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
   setIsOpen,
   isLoggedIn,
   setIsLoggedIn,
@@ -35,6 +35,7 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
+
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -56,9 +57,12 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
   const handleLoginModal = () => {
     setIsOpen(true);
   };
+
   const handleAccount = () => {
     navigate("/account");
+    handleClose();
   };
+
   return (
     <Box
       sx={{ flexGrow: 1, textAlign: "center", height: "80px" }}
@@ -69,8 +73,12 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
     >
       <AppBar
         position="fixed"
-        elevation={0}
-        sx={{ height: "80px", justifyContent: "center" }}
+        elevation={1}
+        sx={{
+          height: "80px",
+          justifyContent: "center",
+          background: darkMode ? "#333" : "primary.main",
+        }}
       >
         <Toolbar
           sx={{
@@ -79,6 +87,7 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
             justifyContent: "center",
           }}
         >
+          {/*  Logo Section */}
           <Typography
             sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}
             component={Link}
@@ -91,7 +100,10 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
             />
             <img src="/talection.png" alt="Talection" style={{ height: 24 }} />
           </Typography>
+
           <Box sx={{ flexGrow: 1 }} />
+
+          {/*  User Menu */}
           <div>
             {isLoggedIn ? (
               <>
@@ -109,13 +121,12 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
                   id="account-menu"
                   open={open}
                   onClose={handleClose}
-                  onClick={handleClose}
                   slotProps={{
                     paper: {
-                      elevation: 0,
+                      elevation: 2,
                       sx: {
-                        overflow: "visible",
-                        filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                        minWidth: 180,
+                        filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.2))",
                         mt: 1.5,
                         "& .MuiAvatar-root": {
                           width: 32,
@@ -141,20 +152,20 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
                   transformOrigin={{ horizontal: "right", vertical: "top" }}
                   anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                 >
-                  <MenuItem onClick={handleClose}>
-                    <Avatar /> Profile
-                  </MenuItem>
                   <MenuItem onClick={handleAccount}>
-                    <Avatar /> My account
+                    <Avatar /> Profile
                   </MenuItem>
 
                   <Divider />
-                  <MenuItem onClick={handleClose}>
+
+                  <MenuItem>
                     <ListItemIcon>
                       <Settings fontSize="small" />
                     </ListItemIcon>
                     Settings
                   </MenuItem>
+
+                  {/*  Dark Mode Toggle */}
                   <MenuItem onClick={handleDarkMode}>
                     <ListItemIcon>
                       {darkMode ? (
@@ -165,6 +176,8 @@ const ButtonAppBar: React.FC<ButtaonAppBarProps> = ({
                     </ListItemIcon>
                     {darkMode ? "Light Mode" : "Dark Mode"}
                   </MenuItem>
+
+                  {/*  Logout Button */}
                   <MenuItem onClick={handleLogout}>
                     <ListItemIcon>
                       <Logout fontSize="small" />
