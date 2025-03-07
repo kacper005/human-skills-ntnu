@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 
 interface Test {
   id: number;
+  key: string;
   title: string;
   description: string;
   type: string;
@@ -11,33 +12,26 @@ interface Test {
 const testData: Test[] = [
   {
     id: 1,
-    title: "Intelligence Test Crystalised",
-    description: "Indicative Intelligence Test, Crystalised",
-    type: "questionnaire",
-  },
-  {
-    id: 2,
+    key: "big5",
     title: "BIG-5",
     description: "Personality Test, BIG-5",
     type: "questionnaire",
   },
+  {
+    id: 2,
+    key: "intFluid",
+    title: "Intelligence Fluid",
+    description: "Intelligence Fluid Test",
+    type: "game",
+  },
 ];
 
 import Typography from "@mui/material/Typography";
-// import GameInfo from "./GameInfo";
-// import { useState } from "react";
 import TestCard from "./TestCard";
 
 const TestCardGrid = () => {
-  //   const [gameInfo, setGameInfo] = useState<string[]>(["", ""]);
-  //   const [gameModalOpen, setGameModalOpen] = useState(false);
   return (
     <>
-      {/* <GameInfo
-        gameInfo={gameInfo}
-        gameModalOpen={gameModalOpen}
-        setGameModalOpen={setGameModalOpen}
-      /> */}
       <Box sx={{ flexGrow: 1 }}>
         <Typography variant="h4" color="secondary" paddingBottom="24px">
           <Box sx={{ fontWeight: "bold", m: 1 }}>Tests</Box>

@@ -13,6 +13,7 @@ import Login from "./components/Login";
 import Home from "./components/Home";
 import { useState } from "react";
 import Questionnaire from "./components/Questionnaire";
+import IntFluidController from "./components/games/intFluid/IntFluidController";
 
 const darkTheme = createTheme({
   palette: {
@@ -72,10 +73,7 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
 
   return (
-    <ThemeProvider
-      theme={darkMode ? darkTheme : lightTheme}
-      defaultMode="light"
-    >
+    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <CssBaseline />
       <Router>
         <AppHeader
@@ -96,6 +94,7 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/game" element={<Game />} />
             <Route path="/test" element={<Questionnaire />} />
+            <Route path="/test2" element={<IntFluidController />} />
           </Routes>
         </div>
       </Router>

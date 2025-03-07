@@ -44,13 +44,16 @@ const Questionnaire: React.FC = () => {
   return (
     <Container maxWidth="md">
       <Box display="flex" flexDirection="column" alignItems="center">
-        <Typography variant="h4" component="h1" gutterBottom>
-          Personality Self Assesment
-        </Typography>
         <Paper
           elevation={0}
           sx={{ width: "100%", padding: "16px", borderRadius: 5 }}
         >
+          <br />
+          <Typography variant="h5" component="h1" gutterBottom align="center">
+            Personality Self Assessment
+          </Typography>
+          <br />
+          <Divider />
           {questions.map((question) => (
             <FormControl component="fieldset" key={question.id} fullWidth>
               <Box
@@ -69,7 +72,7 @@ const Questionnaire: React.FC = () => {
                   row
                   value={answers[question.id] || ""}
                   onChange={(event) => handleChange(event, question.id)}
-                  sx={{ flexGrow: 0 }}
+                  sx={{ flexGrow: 0, gap: 0.0 }}
                 >
                   <FormControlLabel
                     value="1"
@@ -78,6 +81,7 @@ const Questionnaire: React.FC = () => {
                         sx={{
                           color: "red",
                           "&.Mui-checked": { color: "red" },
+                          transform: "scale(1.4)",
                         }}
                       />
                     }
@@ -90,6 +94,7 @@ const Questionnaire: React.FC = () => {
                         sx={{
                           color: "orange",
                           "&.Mui-checked": { color: "orange" },
+                          transform: "scale(1.1)",
                         }}
                       />
                     }
@@ -102,6 +107,7 @@ const Questionnaire: React.FC = () => {
                         sx={{
                           color: "grey",
                           "&.Mui-checked": { color: "grey" },
+                          transform: "scale(0.9)",
                         }}
                       />
                     }
@@ -114,6 +120,7 @@ const Questionnaire: React.FC = () => {
                         sx={{
                           color: "lightgreen",
                           "&.Mui-checked": { color: "lightgreen" },
+                          transform: "scale(1.1)",
                         }}
                       />
                     }
@@ -126,6 +133,7 @@ const Questionnaire: React.FC = () => {
                         sx={{
                           color: "green",
                           "&.Mui-checked": { color: "green" },
+                          transform: "scale(1.4)",
                         }}
                       />
                     }

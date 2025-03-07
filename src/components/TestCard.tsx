@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, Typography, Button } from "@mui/material";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface TestCardProps {
   title: string;
@@ -9,10 +9,11 @@ interface TestCardProps {
 }
 
 const TestCard: React.FC<TestCardProps> = ({ title, description, type }) => {
-  //   const handleGameStart = () => {
-  //     setGameModalOpen(true);
-  //     setGameInfo([title, descriptionFull]);
-  //   };
+  const navigate = useNavigate();
+
+  // React.useEffect(() => {
+  //   // Any side effects or navigation logic can go here
+  // }, [navigate]);
 
   return (
     <Card
@@ -51,7 +52,13 @@ const TestCard: React.FC<TestCardProps> = ({ title, description, type }) => {
           variant="contained"
           color="secondary"
           style={{ marginTop: "12px", width: "100%" }}
-          //   onClick={handleGameStart}
+          onClick={() => {
+            if (type === "questionnaire") {
+              navigate("/test");
+            } else if (type === "game") {
+              navigate("/test2");
+            }
+          }}
         >
           Take Test
         </Button>
