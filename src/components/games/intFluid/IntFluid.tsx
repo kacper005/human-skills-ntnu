@@ -5,9 +5,15 @@ import Divider from "@mui/material/Divider";
 interface IntFluidProps {
   gridImage: string;
   choices: string[];
+  correctChoice: string;
+  onChoiceClick: (choice: string) => void;
 }
 
-const IntFluid: React.FC<IntFluidProps> = ({ gridImage, choices }) => {
+const IntFluid: React.FC<IntFluidProps> = ({
+  gridImage,
+  choices,
+  onChoiceClick,
+}) => {
   return (
     <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
       <Paper
@@ -17,14 +23,20 @@ const IntFluid: React.FC<IntFluidProps> = ({ gridImage, choices }) => {
           justifyContent: "center",
           padding: "32px",
           alignItems: "center",
-          maxWidth: "fit-content",
+          maxWidth: "90vw",
+          flexWrap: "wrap",
         }}
       >
         {/* Grid Image */}
         <img
           src={gridImage}
           alt="Grid"
-          style={{ maxWidth: "450px", height: "auto" }}
+          style={{
+            width: "40vw",
+            maxWidth: "400px",
+            height: "auto",
+            objectFit: "contain",
+          }}
         />
 
         {/* Vertical Divider */}
@@ -46,12 +58,19 @@ const IntFluid: React.FC<IntFluidProps> = ({ gridImage, choices }) => {
                 justifyContent: "center",
                 cursor: "pointer",
               }}
-              onClick={() => console.log(`Clicked on choice ${index}`)}
+              onClick={() => onChoiceClick(choice)}
             >
               <img
                 src={choice}
                 alt={`Choice ${index}`}
-                style={{ maxWidth: "150px", transition: "transform 0.3s" }}
+                style={{
+                  width: "15vw",
+                  maxWidth: "120px",
+                  height: "15vw",
+                  maxHeight: "120px",
+                  objectFit: "contain",
+                  transition: "transform 0.3s",
+                }}
                 onMouseEnter={(e) =>
                   (e.currentTarget.style.transform = "scale(1.05)")
                 }
