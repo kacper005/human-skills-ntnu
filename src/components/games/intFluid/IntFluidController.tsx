@@ -14,6 +14,7 @@ const IntFluidController: React.FC = () => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(-1);
   const [startTime, setStartTime] = useState<number>(Date.now());
   const [totalTime, setTotalTime] = useState<number>(0);
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchGameAssets = async () => {
@@ -78,21 +79,34 @@ const IntFluidController: React.FC = () => {
       setAssets(remainingAssets.slice(1));
       setCurrentQuestion((prev) => prev + 1);
     } else {
-      console.log("Game Over! Final score:", score);
+      setIsGameOver(true); // Mark the game as over
     }
   };
 
   const handleChoiceClick = (choice: string) => {
     if (choice === correctChoice) {
-      console.log("Correct!");
       setScore((prev) => prev + 1);
-    } else {
-      console.log("Incorrect.");
     }
-
-    console.log(`Current score: ${score + (choice === correctChoice ? 1 : 0)}`);
     loadNextBoard(assets);
   };
+
+  if (isGameOver) {
+    return (
+      <Paper
+        elevation={3}
+        style={{
+          padding: "32px",
+          borderRadius: "12px",
+          maxWidth: "400px",
+          margin: "100px auto",
+          textAlign: "center",
+        }}
+      >
+        <Typography variant="h4">Game Over</Typography>
+        <Typography variant="h6">Your Score: {score}</Typography>
+      </Paper>
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>

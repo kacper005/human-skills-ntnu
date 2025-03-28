@@ -22,6 +22,7 @@ interface Question {
 const Questionnaire: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     setQuestions(questionsData.questions);
@@ -39,7 +40,25 @@ const Questionnaire: React.FC = () => {
 
   const handleSubmit = () => {
     console.log("Submitted answers:", answers);
+    setSubmitted(true);
   };
+
+  if (submitted) {
+    return (
+      <Container maxWidth="md">
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <Paper
+            elevation={0}
+            sx={{ width: "100%", padding: "16px", borderRadius: 5 }}
+          >
+            <Typography variant="h5" component="h1" gutterBottom align="center">
+              Thank you for taking this test!
+            </Typography>
+          </Paper>
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="md">
