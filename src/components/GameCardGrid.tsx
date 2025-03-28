@@ -67,7 +67,7 @@ const gameData: Game[] = [
   {
     id: 5,
     title: "Super Mario",
-    description: "Help Mario as he adventures through the Mushroom Kingdom.",
+    description: "Help Mario as he advertures through the Mushroom Kingdom.",
     type: "Sidescroller",
     difficulty: "Insane",
     image: "/game_images/troll.jpg",
