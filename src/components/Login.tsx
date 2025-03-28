@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  useTheme,
 } from "@mui/material";
 
 interface LoginProps {
@@ -16,6 +17,7 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
+  const theme = useTheme();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +47,8 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
         PaperProps={{
           style: {
             borderRadius: 20,
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
           },
         }}
       >
@@ -53,8 +57,12 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
+          sx={{
+            padding: 3,
+            backgroundColor: theme.palette.background.paper,
+          }}
         >
-          <DialogTitle sx={{ marginTop: 1 }}>
+          <DialogTitle sx={{ marginTop: 1, color: theme.palette.text.primary }}>
             {isSignUp ? "Sign Up" : "Login"}
           </DialogTitle>
           <DialogContent>
@@ -72,6 +80,9 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
                 autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                InputProps={{
+                  sx: { backgroundColor: theme.palette.background.default },
+                }}
               />
               <TextField
                 variant="outlined"
@@ -85,6 +96,9 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                InputProps={{
+                  sx: { backgroundColor: theme.palette.background.default },
+                }}
               />
               {isSignUp && (
                 <TextField
@@ -98,6 +112,9 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
                   id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  InputProps={{
+                    sx: { backgroundColor: theme.palette.background.default },
+                  }}
                 />
               )}
 
@@ -105,8 +122,20 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                color="secondary"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.primary.dark
+                      : theme.palette.primary.main,
+                  "&:hover": {
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? theme.palette.primary.light
+                        : theme.palette.primary.dark,
+                  },
+                }}
               >
                 {isSignUp ? "Sign Up" : "Login"}
               </Button>
