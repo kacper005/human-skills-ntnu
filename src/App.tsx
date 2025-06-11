@@ -1,21 +1,27 @@
+import React from "react";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
   Navigate,
 } from "react-router-dom";
-import AppHeader from "./components/AppHeader";
-import UserAccount from "./components/UserAccount";
+import AppHeader from "./components/organisms/AppHeader";
 import CssBaseline from "@mui/material/CssBaseline";
 import "./App.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import theme from "./components/theme";
 import Game from "./components/Game";
-import Login from "./components/Login";
-import Home from "./components/Home";
-import { useState, useMemo } from "react";
 import Questionnaire from "./components/Questionnaire";
 import IntFluidController from "./components/games/intFluid/IntFluidController";
+import Home from "./components/pages/Home";
+import { Login } from "./components/pages/Login";
+import { SignUp } from "./components/pages/SignUp";
+import { Admin } from "./components/pages/Admin";
+import { UserProfile } from "./components/pages/UserProfile";
+import { useAuth } from "./hooks/useAuth";
+import { ProtectedRoute } from "./context/ProtectedRoute";
+import { AdminRoute } from "./context/AdminRoute";
+import { NotFound } from "./components/pages/NotFound";
 
 //  Function to dynamically switch between light and dark mode
 const getTheme = (darkMode: boolean) =>
@@ -27,13 +33,13 @@ const getTheme = (darkMode: boolean) =>
     },
   });
 
-function App() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [darkMode, setDarkMode] = useState(false); //  Dark mode state
+export const App: React.FC = () => {
+  const { isLoggedIn } = useAuth();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [darkMode, setDarkMode] = React.useState(false); //  Dark mode state
 
   //  Memoize the theme to prevent unnecessary re-renders
-  const muiTheme = useMemo(() => getTheme(darkMode), [darkMode]);
+  const muiTheme = React.useMemo(() => getTheme(darkMode), [darkMode]);
 
   return (
     <ThemeProvider theme={muiTheme}>
@@ -41,29 +47,30 @@ function App() {
       <Router>
         <AppHeader
           setIsOpen={setIsOpen}
-          setIsLoggedIn={setIsLoggedIn}
           isLoggedIn={isLoggedIn}
           darkMode={darkMode}
           setDarkMode={setDarkMode} //  Pass dark mode toggle function to header
         />
-        <Login
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
-          setIsLoggedIn={setIsLoggedIn}
-        />
+        <Login isOpen={isOpen} setIsOpen={setIsOpen} />
         <div className="app">
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/account" element={<UserAccount />} />
             <Route path="/game" element={<Game />} />
             <Route path="/test" element={<Questionnaire />} />
             <Route path="/test2" element={<IntFluidController />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="not-found" element={<NotFound />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/user-profile" element={<UserProfile />} />
+            </Route>
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<Admin />} />
+            </Route>
           </Routes>
         </div>
       </Router>
     </ThemeProvider>
   );
-}
-
-export default App;
+};

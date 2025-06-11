@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   TextField,
   Button,
@@ -8,35 +8,54 @@ import {
   DialogTitle,
   DialogContent,
   useTheme,
+  Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { showToast } from "../atoms/Toast";
+import { AuthProvider as AuthProviderType } from "../../enums/AuthProvider";
+import { useAuth } from "../../hooks/useAuth";
 
 interface LoginProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
+export const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen }) => {
   const theme = useTheme();
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const { login } = useAuth();
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (isSignUp && password !== confirmPassword) {
-      alert("Passwords do not match");
+
+    if (!login) {
+      showToast({ message: "Auth context not available", type: "error" });
       return;
     }
 
-    setIsOpen(false);
-    setIsLoggedIn(true);
+    try {
+      await login(email, password, AuthProviderType.LOCAL);
+      showToast({ message: "Login successful", type: "success" });
+
+      handleClose();
+    } catch (error: any) {
+      console.error("Login error:", error);
+      showToast({
+        message: "Login failed: Invalid credentials or server error",
+        type: "error",
+      });
+    }
   };
 
   const handleClose = () => {
     setIsOpen(false);
-    setIsSignUp(false);
+    setError(null);
+    setEmail("");
+    setPassword("");
   };
 
   return (
@@ -62,60 +81,41 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
             backgroundColor: theme.palette.background.paper,
           }}
         >
-          <DialogTitle sx={{ marginTop: 1, color: theme.palette.text.primary }}>
-            {isSignUp ? "Sign Up" : "Login"}
+          <DialogTitle sx={{ color: theme.palette.text.primary }}>
+            Login
           </DialogTitle>
           <DialogContent>
             <form onSubmit={handleSubmit}>
               <TextField
-                sx={{ marginTop: 1 }}
                 variant="outlined"
                 margin="normal"
                 required
                 fullWidth
-                id="email"
                 label="Email Address"
                 name="email"
+                type="email"
                 autoComplete="email"
                 autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                InputProps={{
-                  sx: { backgroundColor: theme.palette.background.default },
-                }}
               />
               <TextField
                 variant="outlined"
                 margin="normal"
                 required
                 fullWidth
-                name="password"
                 label="Password"
+                name="password"
                 type="password"
-                id="password"
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                InputProps={{
-                  sx: { backgroundColor: theme.palette.background.default },
-                }}
               />
-              {isSignUp && (
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="confirmPassword"
-                  label="Confirm Password"
-                  type="password"
-                  id="confirmPassword"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  InputProps={{
-                    sx: { backgroundColor: theme.palette.background.default },
-                  }}
-                />
+
+              {error && (
+                <Typography color="error" variant="body2" mt={1}>
+                  {error}
+                </Typography>
               )}
 
               <Button
@@ -137,17 +137,19 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
                   },
                 }}
               >
-                {isSignUp ? "Sign Up" : "Login"}
+                Login
               </Button>
+
               <Button
                 fullWidth
                 variant="text"
                 color="secondary"
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={() => {
+                  navigate("/sign-up");
+                  setIsOpen(false);
+                }}
               >
-                {isSignUp
-                  ? "Already have an account? Login"
-                  : "Don't have an account? Sign Up"}
+                Don't have an account? Sign Up
               </Button>
             </form>
           </DialogContent>
@@ -156,5 +158,3 @@ const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
     </Container>
   );
 };
-
-export default Login;

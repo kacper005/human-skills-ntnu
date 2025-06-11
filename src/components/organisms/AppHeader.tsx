@@ -1,9 +1,9 @@
+import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Avatar, Divider, ListItemIcon, Typography } from "@mui/material";
@@ -11,16 +11,16 @@ import {
   Login,
   Logout,
   Settings,
-  DarkMode,
-  LightMode,
+  // DarkMode,
+  // LightMode,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 interface ButtonAppBarProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   darkMode: boolean;
   setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -28,11 +28,11 @@ interface ButtonAppBarProps {
 const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
   setIsOpen,
   isLoggedIn,
-  setIsLoggedIn,
   darkMode,
-  setDarkMode,
+  //setDarkMode,
 }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { logout } = useAuth();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
 
@@ -40,14 +40,13 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
     setAnchorEl(event.currentTarget);
   };
 
-  const handleDarkMode = () => {
-    setDarkMode((prev) => !prev);
-    handleClose();
-  };
+  // const handleDarkMode = () => {
+  //   setDarkMode((prev) => !prev);
+  //   handleClose();
+  // };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    handleClose();
+    logout();
   };
 
   const handleClose = () => {
@@ -59,7 +58,7 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
   };
 
   const handleAccount = () => {
-    navigate("/account");
+    navigate("/user-profile");
     handleClose();
   };
 
@@ -165,7 +164,7 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
                     Settings
                   </MenuItem>
 
-                  {/*  Dark Mode Toggle */}
+                  {/* Dark Mode Toggle
                   <MenuItem onClick={handleDarkMode}>
                     <ListItemIcon>
                       {darkMode ? (
@@ -175,7 +174,7 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
                       )}
                     </ListItemIcon>
                     {darkMode ? "Light Mode" : "Dark Mode"}
-                  </MenuItem>
+                  </MenuItem> */}
 
                   {/*  Logout Button */}
                   <MenuItem onClick={handleLogout}>

@@ -1,7 +1,7 @@
 import React from "react";
-import GameCardGrid from "./GameCardGrid";
-import TestCardGrid from "./TestCardGrid";
 import { Box, useTheme } from "@mui/material";
+import TestCardGrid from "../TestCardGrid";
+import GameCardGrid from "../GameCardGrid";
 
 const Home: React.FC = () => {
   const theme = useTheme();
