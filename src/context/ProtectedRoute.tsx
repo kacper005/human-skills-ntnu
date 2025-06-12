@@ -3,12 +3,12 @@ import { Navigate, Outlet } from "react-router-dom";
 // import { LoadingSpinner } from "./LoadingSpinner"; TODO: Add later
 import { useAuth } from "../hooks/useAuth";
 
-export const ProtectedRoute = ({ redirectTo = "/sign-in" }) => {
+export const ProtectedRoute = ({ redirectTo = "/" }) => {
   const { isLoggedIn, loading } = useAuth();
 
   if (loading)
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div>
         <p>Loading...</p>
       </div>
     );

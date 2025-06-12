@@ -1,5 +1,5 @@
 import Grid from "@mui/material/Grid";
-import GameCard from "./GameCard";
+import { GameCard } from "./GameCard";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import GameInfo from "./GameInfo";

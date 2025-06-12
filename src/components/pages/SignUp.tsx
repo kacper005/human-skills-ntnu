@@ -53,11 +53,6 @@ export const SignUp: React.FC = () => {
         role: Role.STUDENT,
         gender: Gender.MALE,
       });
-
-      showToast({
-        message: "Signup successful!",
-        type: "success",
-      });
     } catch (err: any) {
       showToast({
         message: err.response?.data?.message || "Signup failed",
@@ -65,6 +60,10 @@ export const SignUp: React.FC = () => {
       });
     } finally {
       setLoading(false);
+      showToast({
+        message: "Signup successful!",
+        type: "success",
+      });
       navigate("/");
     }
   };

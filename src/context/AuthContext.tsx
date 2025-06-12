@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import { axiosInstance } from "../api/axiosInstance";
 import { User, getUserMe } from "../api/userApi";
 import { AuthProvider as AuthProviderType } from "../enums/AuthProvider";
@@ -24,10 +26,26 @@ export const AuthContext = React.createContext<AuthContextType | undefined>(
   undefined
 );
 
+const isTokenValid = (token: string): boolean => {
+  try {
+    const { exp } = jwtDecode<{ exp: number }>(token);
+    return exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+};
+
 export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
   const [user, setUser] = React.useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
+
+  const logout = () => {
+    localStorage.removeItem("authToken");
+    delete axiosInstance.defaults.headers.Authorization;
+    setUser(null);
+    setIsLoggedIn(false);
+  };
 
   const fetchUser = async () => {
     try {
@@ -35,9 +53,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
       setUser(response.data);
       setIsLoggedIn(true);
     } catch (error) {
-      console.error("Failed to fetch user", error);
-      setUser(null);
-      setIsLoggedIn(false);
+      logout();
     } finally {
       setLoading(false);
     }
@@ -45,12 +61,13 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
 
   React.useEffect(() => {
     const token = localStorage.getItem("authToken");
-    if (token) {
+
+    if (token && isTokenValid(token)) {
       axiosInstance.defaults.headers.Authorization = `Bearer ${token}`;
       fetchUser();
     } else {
+      logout();
       setLoading(false);
-      setIsLoggedIn(false);
     }
   }, []);
 
@@ -67,8 +84,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
       axiosInstance.defaults.headers.Authorization = `Bearer ${token}`;
       await fetchUser();
     } catch (error) {
-      console.error("Login failed", error);
-      setIsLoggedIn(false);
+      logout();
       throw error;
     }
   };
@@ -86,16 +102,9 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
       await fetchUser();
     } catch (error) {
       console.error("Google login failed", error);
-      setIsLoggedIn(false);
+      logout();
       throw error;
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem("authToken");
-    setUser(null);
-    setIsLoggedIn(false);
-    delete axiosInstance.defaults.headers.Authorization;
   };
 
   const contextValue: AuthContextType = {

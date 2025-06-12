@@ -11,7 +11,7 @@ interface GameCardProps {
   setGameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const GameCard: React.FC<GameCardProps> = ({
+export const GameCard: React.FC<GameCardProps> = ({
   title,
   description,
   type,
@@ -90,5 +90,3 @@ const GameCard: React.FC<GameCardProps> = ({
     </Card>
   );
 };
-
-export default GameCard;

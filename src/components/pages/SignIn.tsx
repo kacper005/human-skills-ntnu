@@ -20,7 +20,7 @@ interface LoginProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Login: React.FC<LoginProps> = ({ isOpen, setIsOpen }) => {
+export const SignIn: React.FC<LoginProps> = ({ isOpen, setIsOpen }) => {
   const theme = useTheme();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");

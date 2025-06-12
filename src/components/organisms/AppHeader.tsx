@@ -47,6 +47,7 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
 
   const handleLogout = () => {
     logout();
+    navigate("/");
   };
 
   const handleClose = () => {
@@ -93,11 +94,10 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
             to="/home"
           >
             <img
-              src="/logo.png"
+              src="/HumanSkillsLogo.png"
               alt="Logo"
-              style={{ height: 32, marginRight: 32 }}
+              style={{ height: 64, marginRight: 32 }}
             />
-            <img src="/talection.png" alt="Talection" style={{ height: 24 }} />
           </Typography>
 
           <Box sx={{ flexGrow: 1 }} />
@@ -157,11 +157,11 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
 
                   <Divider />
 
-                  <MenuItem>
+                  <MenuItem onClick={() => navigate("/admin")}>
                     <ListItemIcon>
                       <Settings fontSize="small" />
                     </ListItemIcon>
-                    Settings
+                    Admin Dashboard
                   </MenuItem>
 
                   {/* Dark Mode Toggle

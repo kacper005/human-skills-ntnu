@@ -42,8 +42,5 @@ export const showToast = ({
     draggable,
     theme,
     transition: Bounce,
-    style: {
-      fontSize: "1.6rem",
-    },
   });
 };
