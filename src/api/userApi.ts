@@ -31,10 +31,7 @@ export interface CreateUserDto {
 export interface UpdateUserDto {
   firstName?: string;
   lastName?: string;
-  gender?: Gender;
-  //email?: string;
-  //password?: string;
-  //role?: string;
+  gender?: Gender | "";
 }
 
 export const getUserMe = () => axiosInstance.get<User>(`${BASE_URL}/get-me`);

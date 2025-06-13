@@ -5,17 +5,17 @@ const BASE_URL = "/student-profile";
 export interface StudentProfile {
   id: string;
   studyProgramId: number;
-  yearsOfStudy: number;
+  yearOfStudy: number;
 }
 
 export interface CreateStudentProfileDto {
-  studyProgramId: number;
-  yearsOfStudy: number;
+  studyProgramId: number | "";
+  yearOfStudy: number | "";
 }
 
 export interface UpdateStudentProfileDto {
-  studyProgramId?: number;
-  yearsOfStudy?: number;
+  studyProgramId?: number | "";
+  yearOfStudy?: number | "";
 }
 
 export const getStudentProfile = () =>

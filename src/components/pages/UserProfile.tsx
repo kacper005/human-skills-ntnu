@@ -1,6 +1,5 @@
 import React from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 import {
   Paper,
   Typography,
@@ -23,7 +22,6 @@ import { UpdateUserDto, updateUserMe } from "../../api/userApi";
 import { Gender, getGenderDisplayName } from "../../enums/Gender";
 
 export const UserProfile: React.FC = () => {
-  const navigate = useNavigate();
   const { user, loading } = useAuth();
 
   const [userEditMode, setUserEditMode] = React.useState(false);
@@ -36,38 +34,34 @@ export const UserProfile: React.FC = () => {
   const [userData, setUserData] = React.useState<UpdateUserDto>({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
-    gender: user?.gender ?? undefined,
+    gender: user?.gender || "",
   });
 
   const [formData, setFormData] = React.useState<CreateStudentProfileDto>({
-    studyProgramId: 0,
-    yearsOfStudy: 1,
+    studyProgramId: "",
+    yearOfStudy: "",
   });
 
   React.useEffect(() => {
-    if (!loading && !user) {
-      navigate("/");
-    } else if (user) {
-      setUserData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        gender: user.gender,
-      });
+    fetchStudyPrograms();
+    if (user && user.role === "STUDENT") {
       fetchStudentProfile();
-      fetchStudyPrograms();
     }
-  }, [loading, user, navigate]);
+  }, [user]);
 
   const fetchStudentProfile = async () => {
     try {
       const res = await getStudentProfile();
       setStudentProfile(res.data);
       setFormData({
-        studyProgramId: res.data.studyProgramId,
-        yearsOfStudy: res.data.yearsOfStudy,
+        studyProgramId: res.data.studyProgramId || "",
+        yearOfStudy: res.data.yearOfStudy || "",
       });
     } catch {
-      console.warn("No student profile found.");
+      setFormData({
+        studyProgramId: "",
+        yearOfStudy: "",
+      });
     }
   };
 
@@ -89,29 +83,28 @@ export const UserProfile: React.FC = () => {
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === "yearOfStudy" && value !== "" ? Number(value) : value,
     }));
   };
 
-  const handleUserSave = async () => {
+  const handleUserSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedUserData: UpdateUserDto = {
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      gender: userData.gender,
+    };
     try {
-      if (user) {
-        const updated = await updateUserMe(userData);
-        setUserData({
-          firstName: updated.data.firstName,
-          lastName: updated.data.lastName,
-          gender: updated.data.gender,
-        });
-      }
+      await updateUserMe(updatedUserData);
       showToast({ message: "User info updated", type: "success" });
       setUserEditMode(false);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
       showToast({ message: "Failed to update user info", type: "error" });
     }
   };
 
-  const handleStudentSave = async () => {
+  const handleStudentProfileSave = async () => {
     console.log("Saving student profile with data:", formData);
     try {
       await createStudentProfile(formData);
@@ -136,12 +129,24 @@ export const UserProfile: React.FC = () => {
   return (
     <div>
       <div>
-        <Grid container spacing={4} justifyContent="center">
+        <Grid
+          container
+          spacing={4}
+          justifyContent="center"
+          alignItems="stretch"
+        >
           {/* User Profile Card */}{" "}
           <Grid item>
             <Paper
               elevation={4}
-              sx={{ width: 400, padding: 4, borderRadius: 3 }}
+              sx={{
+                width: 400,
+                padding: 4,
+                borderRadius: 3,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
             >
               <Typography variant="h5" gutterBottom>
                 User Profile
@@ -181,13 +186,17 @@ export const UserProfile: React.FC = () => {
                     select
                     label="Gender"
                     name="gender"
-                    value={userData.gender || ""}
-                    onChange={(e) =>
-                      setUserData({
-                        ...userData,
-                        gender: e.target.value as Gender,
-                      })
-                    }
+                    value={userData.gender}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setUserData((prev) => ({
+                        ...prev,
+                        gender:
+                          value !== undefined && value !== null
+                            ? (value as Gender)
+                            : "",
+                      }));
+                    }}
                     disabled={!userEditMode}
                     fullWidth
                   >
@@ -210,7 +219,10 @@ export const UserProfile: React.FC = () => {
               <div>
                 {userEditMode ? (
                   <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-                    <Button onClick={() => setUserEditMode(false)}>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setUserEditMode(false)}
+                    >
                       Cancel
                     </Button>
                     <Button variant="contained" onClick={handleUserSave}>
@@ -231,94 +243,118 @@ export const UserProfile: React.FC = () => {
           </Grid>
           <Grid item>
             {/* Student Profile Card */}
-            <Paper
-              elevation={4}
-              sx={{ width: 400, padding: 4, borderRadius: 3 }}
-            >
-              <Typography variant="h5" gutterBottom>
-                Student Profile
-              </Typography>
+            {user?.role === "STUDENT" && (
+              <Paper
+                elevation={4}
+                sx={{
+                  width: 400,
+                  padding: 4,
+                  borderRadius: 3,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography variant="h5" gutterBottom>
+                  Student Profile
+                </Typography>
 
-              {studentProfile || studentEditMode ? (
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      select
-                      label="Study Program"
-                      name="studyProgramId"
-                      value={formData.studyProgramId}
-                      onChange={handleStudentChange}
-                      fullWidth
-                      disabled={!studentEditMode}
-                    >
-                      {studyPrograms.map((program) => (
-                        <MenuItem key={program.id} value={program.id}>
-                          {program.name}
+                {studentProfile || studentEditMode ? (
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        select
+                        label="Study Program"
+                        name="studyProgramId"
+                        value={formData.studyProgramId}
+                        onChange={handleStudentChange}
+                        fullWidth
+                        disabled={!studentEditMode}
+                      >
+                        <MenuItem value="">
+                          <em>Select Study Program</em>
                         </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Year of Study"
-                      name="yearsOfStudy"
-                      type="number"
-                      value={formData.yearsOfStudy}
-                      onChange={handleStudentChange}
-                      fullWidth
-                      disabled={!studentEditMode}
-                    />
-                  </Grid>
+                        {studyPrograms.map((program) => (
+                          <MenuItem key={program.id} value={program.id}>
+                            {program.name}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        select
+                        label="Start Year"
+                        name="yearOfStudy"
+                        value={formData.yearOfStudy || ""}
+                        onChange={handleStudentChange}
+                        fullWidth
+                        disabled={!studentEditMode}
+                      >
+                        <MenuItem value="">
+                          <em>Select Year</em>
+                        </MenuItem>
+                        {[...Array(4)].map((_, i) => {
+                          const year = new Date().getFullYear() - i;
+                          return (
+                            <MenuItem key={year} value={year}>
+                              {year}
+                            </MenuItem>
+                          );
+                        })}
+                      </TextField>
+                    </Grid>
 
-                  <Grid item xs={12}>
-                    <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-                      {studentEditMode ? (
-                        <>
-                          <Button
-                            onClick={() => setStudentEditMode(false)}
-                            variant="outlined"
-                          >
-                            Cancel
-                          </Button>
+                    <Grid item xs={12}>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {studentEditMode ? (
+                          <>
+                            <Button
+                              onClick={() => setStudentEditMode(false)}
+                              variant="outlined"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              variant="contained"
+                              onClick={handleStudentProfileSave}
+                            >
+                              Save
+                            </Button>
+                          </>
+                        ) : (
                           <Button
                             variant="contained"
-                            onClick={handleStudentSave}
+                            onClick={() => setStudentEditMode(true)}
                           >
-                            Save
+                            {studentProfile
+                              ? "Edit Student Info"
+                              : "Create Profile"}
                           </Button>
-                        </>
-                      ) : (
-                        <Button
-                          variant="contained"
-                          onClick={() => setStudentEditMode(true)}
-                        >
-                          {studentProfile
-                            ? "Edit Student Info"
-                            : "Create Profile"}
-                        </Button>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    </Grid>
                   </Grid>
-                </Grid>
-              ) : (
-                <>
-                  <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    gutterBottom
-                  >
-                    No student profile available.
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    onClick={() => setStudentEditMode(true)}
-                    fullWidth
-                  >
-                    Add Student Profile
-                  </Button>
-                </>
-              )}
-            </Paper>
+                ) : (
+                  <>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      gutterBottom
+                    >
+                      No student profile available.
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={() => setStudentEditMode(true)}
+                      fullWidth
+                    >
+                      Add Student Profile
+                    </Button>
+                  </>
+                )}
+              </Paper>
+            )}
           </Grid>
         </Grid>
       </div>

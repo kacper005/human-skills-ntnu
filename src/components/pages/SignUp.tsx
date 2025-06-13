@@ -15,8 +15,10 @@ import { Gender } from "../../enums/Gender";
 import { ToastContainer } from "react-toastify";
 import { showToast } from "../atoms/Toast";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 export const SignUp: React.FC = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState<CreateUserDto>({
     authProvider: AuthProvider.LOCAL,
@@ -30,8 +32,11 @@ export const SignUp: React.FC = () => {
 
   const [loading, setLoading] = React.useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -44,15 +49,15 @@ export const SignUp: React.FC = () => {
 
     try {
       await createUser(formData);
-      setFormData({
-        authProvider: AuthProvider.LOCAL,
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        role: Role.STUDENT,
-        gender: Gender.MALE,
+      const { email, password } = formData;
+      await login(email, password, AuthProvider.LOCAL);
+
+      showToast({
+        message: "Signup successful! You are now logged in.",
+        type: "success",
       });
+
+      navigate("/");
     } catch (err: any) {
       showToast({
         message: err.response?.data?.message || "Signup failed",
@@ -60,11 +65,6 @@ export const SignUp: React.FC = () => {
       });
     } finally {
       setLoading(false);
-      showToast({
-        message: "Signup successful!",
-        type: "success",
-      });
-      navigate("/");
     }
   };
 

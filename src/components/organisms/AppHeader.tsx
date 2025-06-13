@@ -31,7 +31,7 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
   darkMode,
   //setDarkMode,
 }) => {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -157,12 +157,14 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
 
                   <Divider />
 
-                  <MenuItem onClick={() => navigate("/admin")}>
-                    <ListItemIcon>
-                      <Settings fontSize="small" />
-                    </ListItemIcon>
-                    Admin Dashboard
-                  </MenuItem>
+                  {user?.role === "ADMIN" && (
+                    <MenuItem onClick={() => navigate("/admin")}>
+                      <ListItemIcon>
+                        <Settings fontSize="small" />
+                      </ListItemIcon>
+                      Admin Dashboard
+                    </MenuItem>
+                  )}
 
                   {/* Dark Mode Toggle
                   <MenuItem onClick={handleDarkMode}>
