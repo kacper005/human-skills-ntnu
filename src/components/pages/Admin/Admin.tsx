@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardActionArea,
@@ -6,7 +7,6 @@ import {
   Typography,
   Grid,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 const adminLinks = [
   { title: "Study Programs", path: "/admin/study-programs" },

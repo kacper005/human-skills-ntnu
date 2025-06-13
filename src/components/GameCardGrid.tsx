@@ -1,10 +1,10 @@
-import Grid from "@mui/material/Grid";
-import { GameCard } from "./GameCard";
+import React from "react";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import GameInfo from "./GameInfo";
-import { useState } from "react";
 import { useTheme } from "@mui/material/styles";
+import { GameCard } from "./GameCard";
+import { GameInfo } from "./GameInfo";
 
 interface Game {
   id: number;
@@ -75,9 +75,9 @@ const gameData: Game[] = [
   },
 ];
 
-const GameCardGrid = () => {
-  const [gameInfo, setGameInfo] = useState<string[]>(["", ""]);
-  const [gameModalOpen, setGameModalOpen] = useState(false);
+export const GameCardGrid: React.FC = () => {
+  const [gameInfo, setGameInfo] = React.useState<string[]>(["", ""]);
+  const [gameModalOpen, setGameModalOpen] = React.useState(false);
   const theme = useTheme();
 
   return (
@@ -121,5 +121,3 @@ const GameCardGrid = () => {
     </>
   );
 };
-
-export default GameCardGrid;

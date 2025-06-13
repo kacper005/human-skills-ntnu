@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import IntFluid from "./IntFluid";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
-const IntFluidController: React.FC = () => {
-  const [choices, setChoices] = useState<string[]>([]);
-  const [gridImage, setGridImage] = useState<string>("");
-  const [correctChoice, setCorrectChoice] = useState<string>("");
-  const [assets, setAssets] = useState<
+export const IntFluidController: React.FC = () => {
+  const [choices, setChoices] = React.useState<string[]>([]);
+  const [gridImage, setGridImage] = React.useState<string>("");
+  const [correctChoice, setCorrectChoice] = React.useState<string>("");
+  const [assets, setAssets] = React.useState<
     { grid: string; choices: string[]; correct: string }[]
   >([]);
-  const [score, setScore] = useState<number>(0);
-  const [currentQuestion, setCurrentQuestion] = useState<number>(-1);
-  const [startTime, setStartTime] = useState<number>(Date.now());
-  const [totalTime, setTotalTime] = useState<number>(0);
-  const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [score, setScore] = React.useState<number>(0);
+  const [currentQuestion, setCurrentQuestion] = React.useState<number>(-1);
+  const [startTime, setStartTime] = React.useState<number>(Date.now());
+  const [totalTime, setTotalTime] = React.useState<number>(0);
+  const [isGameOver, setIsGameOver] = React.useState<boolean>(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchGameAssets = async () => {
       const res = await fetch("/games/intFluid/filelist.json");
       if (!res.ok) return;
@@ -140,5 +140,3 @@ const IntFluidController: React.FC = () => {
     </div>
   );
 };
-
-export default IntFluidController;

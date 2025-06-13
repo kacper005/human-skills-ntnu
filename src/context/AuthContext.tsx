@@ -1,8 +1,8 @@
 import React from "react";
 import { jwtDecode } from "jwt-decode";
-import { axiosInstance } from "../api/axiosInstance";
-import { User, getUserMe } from "../api/userApi";
-import { AuthProvider as AuthProviderType } from "../enums/AuthProvider";
+import { axiosInstance } from "@api/axiosInstance";
+import { User, getUserMe } from "@api/userApi";
+import { AuthProvider as AuthProviderType } from "@enums/AuthProvider";
 
 export interface AuthContextProps {
   children: React.ReactNode;

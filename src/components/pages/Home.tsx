@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, useTheme } from "@mui/material";
-import TestCardGrid from "../TestCardGrid";
-import GameCardGrid from "../GameCardGrid";
+import { TestCardGrid } from "../TestCardGrid";
+import { GameCardGrid } from "../GameCardGrid";
 
-const Home: React.FC = () => {
+export const Home: React.FC = () => {
   const theme = useTheme();
 
   return (
@@ -20,5 +20,3 @@ const Home: React.FC = () => {
     </Box>
   );
 };
-
-export default Home;

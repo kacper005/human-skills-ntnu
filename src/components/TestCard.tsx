@@ -1,6 +1,6 @@
 import React from "react";
-import { Card, CardContent, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, Typography, Button } from "@mui/material";
 
 interface TestCardProps {
   title: string;
@@ -8,7 +8,11 @@ interface TestCardProps {
   type: string;
 }
 
-const TestCard: React.FC<TestCardProps> = ({ title, description, type }) => {
+export const TestCard: React.FC<TestCardProps> = ({
+  title,
+  description,
+  type,
+}) => {
   const navigate = useNavigate();
 
   // React.useEffect(() => {
@@ -66,5 +70,3 @@ const TestCard: React.FC<TestCardProps> = ({ title, description, type }) => {
     </Card>
   );
 };
-
-export default TestCard;

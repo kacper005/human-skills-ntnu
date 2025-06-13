@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Container,
   Typography,
@@ -20,11 +20,11 @@ interface Question {
 }
 
 const Questionnaire: React.FC = () => {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [questions, setQuestions] = React.useState<Question[]>([]);
+  const [answers, setAnswers] = React.useState<{ [key: number]: string }>({});
+  const [submitted, setSubmitted] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     setQuestions(questionsData.questions);
   }, []);
 

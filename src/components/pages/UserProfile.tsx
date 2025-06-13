@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import {
   Paper,
   Typography,
@@ -9,34 +9,34 @@ import {
   CircularProgress,
   MenuItem,
 } from "@mui/material";
-import { getRoleDisplayName } from "../../enums/Role";
+import { useAuth } from "@hooks/useAuth";
 import {
   getStudentProfile,
   createStudentProfile,
   CreateStudentProfileDto,
   StudentProfile,
-} from "../../api/studentProfileApi";
-import { getStudyPrograms, StudyProgram } from "../../api/studyProgramApi";
-import { showToast } from "../atoms/Toast";
-import { UpdateUserDto, updateUserMe } from "../../api/userApi";
-import { Gender, getGenderDisplayName } from "../../enums/Gender";
+} from "@api/studentProfileApi";
+import { getStudyPrograms, StudyProgram } from "@api/studyProgramApi";
+import { UpdateUserMeDto, deleteUserMe, updateUserMe } from "@api/userApi";
+import { getRoleDisplayName } from "@enums/Role";
+import { Gender, getGenderDisplayName } from "@enums/Gender";
+import { showToast } from "@atoms/Toast";
+import { ConfirmDialog } from "@atoms/ConfirmDialog";
 
 export const UserProfile: React.FC = () => {
-  const { user, loading } = useAuth();
-
+  const { user, loading, logout } = useAuth();
+  const navigate = useNavigate();
+  const [open, setOpen] = React.useState(false);
   const [userEditMode, setUserEditMode] = React.useState(false);
   const [studentEditMode, setStudentEditMode] = React.useState(false);
-
   const [studentProfile, setStudentProfile] =
     React.useState<StudentProfile | null>(null);
   const [studyPrograms, setStudyPrograms] = React.useState<StudyProgram[]>([]);
-
-  const [userData, setUserData] = React.useState<UpdateUserDto>({
+  const [userData, setUserData] = React.useState<UpdateUserMeDto>({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     gender: user?.gender || "",
   });
-
   const [formData, setFormData] = React.useState<CreateStudentProfileDto>({
     studyProgramId: "",
     yearOfStudy: "",
@@ -89,7 +89,7 @@ export const UserProfile: React.FC = () => {
 
   const handleUserSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedUserData: UpdateUserDto = {
+    const updatedUserData: UpdateUserMeDto = {
       firstName: userData.firstName,
       lastName: userData.lastName,
       gender: userData.gender,
@@ -114,6 +114,20 @@ export const UserProfile: React.FC = () => {
     } catch (error) {
       console.error("Error saving student profile", error);
       showToast({ message: "Failed to save student profile", type: "error" });
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      await deleteUserMe();
+      showToast({ message: "Account deleted", type: "success" });
+      setOpen(false);
+      logout();
+    } catch (error) {
+      console.error("Account deletion failed", error);
+      showToast({ message: "Failed to delete account", type: "error" });
+    } finally {
+      navigate("/");
     }
   };
 
@@ -216,29 +230,44 @@ export const UserProfile: React.FC = () => {
                   />
                 </Grid>
               </Grid>
-              <div>
-                {userEditMode ? (
-                  <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+              <Grid item xs={12}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: 8,
+                    marginTop: 16,
+                  }}
+                >
+                  {userEditMode ? (
+                    <>
+                      <Button
+                        variant="outlined"
+                        onClick={() => setUserEditMode(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button variant="contained" onClick={handleUserSave}>
+                        Save
+                      </Button>
+                    </>
+                  ) : (
                     <Button
-                      variant="outlined"
-                      onClick={() => setUserEditMode(false)}
+                      variant="contained"
+                      onClick={() => setUserEditMode(true)}
                     >
-                      Cancel
+                      Edit Profile
                     </Button>
-                    <Button variant="contained" onClick={handleUserSave}>
-                      Save
-                    </Button>
-                  </div>
-                ) : (
+                  )}
                   <Button
                     variant="contained"
-                    onClick={() => setUserEditMode(true)}
-                    sx={{ mt: 2 }}
+                    color="error"
+                    onClick={() => setOpen(true)}
                   >
-                    Edit Profile
+                    Delete Account
                   </Button>
-                )}
-              </div>
+                </div>
+              </Grid>
             </Paper>
           </Grid>
           <Grid item>
@@ -306,7 +335,14 @@ export const UserProfile: React.FC = () => {
                     </Grid>
 
                     <Grid item xs={12}>
-                      <div style={{ display: "flex", gap: 8 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          marginTop: "auto",
+                          justifyContent: "flex-end",
+                        }}
+                      >
                         {studentEditMode ? (
                           <>
                             <Button
@@ -356,6 +392,17 @@ export const UserProfile: React.FC = () => {
               </Paper>
             )}
           </Grid>
+          <ConfirmDialog
+            open={open}
+            title="Delete Account"
+            content="Are you sure you want to delete your account? This action cannot be undone."
+            confirmText="Delete"
+            cancelText="Cancel"
+            confirmationWord="Delete"
+            confirmationPrompt='Type "Delete" to confirm.'
+            onClose={() => setOpen(false)}
+            onConfirm={handleDeleteAccount}
+          />
         </Grid>
       </div>
     </div>

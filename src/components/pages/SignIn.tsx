@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   TextField,
   Button,
@@ -10,10 +11,9 @@ import {
   useTheme,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { showToast } from "../atoms/Toast";
-import { AuthProvider as AuthProviderType } from "../../enums/AuthProvider";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "@hooks/useAuth";
+import { AuthProvider as AuthProviderType } from "@enums/AuthProvider";
+import { showToast } from "@atoms/Toast";
 
 interface LoginProps {
   isOpen: boolean;

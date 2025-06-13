@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -8,14 +9,12 @@ import {
   CircularProgress,
   MenuItem,
 } from "@mui/material";
-import { createUser, CreateUserDto } from "../../api/userApi";
-import { AuthProvider } from "../../enums/AuthProvider";
-import { Role } from "../../enums/Role";
-import { Gender } from "../../enums/Gender";
-import { ToastContainer } from "react-toastify";
-import { showToast } from "../atoms/Toast";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { createUser, CreateUserDto } from "@api/userApi";
+import { useAuth } from "@hooks/useAuth";
+import { Role } from "@enums/Role";
+import { Gender } from "@enums/Gender";
+import { AuthProvider } from "@enums/AuthProvider";
+import { showToast } from "@atoms/Toast";
 
 export const SignUp: React.FC = () => {
   const { login } = useAuth();
@@ -70,7 +69,6 @@ export const SignUp: React.FC = () => {
 
   return (
     <Container maxWidth="sm">
-      <ToastContainer />
       <Box mt={5}>
         <Typography variant="h4" gutterBottom>
           Create Your Account

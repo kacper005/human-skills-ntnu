@@ -1,4 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@hooks/useAuth";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -14,18 +17,16 @@ import {
   // DarkMode,
   // LightMode,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { showToast } from "@atoms/Toast";
 
-interface ButtonAppBarProps {
+interface AppHeaderProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;
   darkMode: boolean;
   setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
+export const AppHeader: React.FC<AppHeaderProps> = ({
   setIsOpen,
   isLoggedIn,
   darkMode,
@@ -45,9 +46,17 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
   //   handleClose();
   // };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      logout();
+      showToast({ message: "Logged out successfully", type: "success" });
+    } catch (error) {
+      console.error("Logout error:", error);
+      showToast({ message: "Logout failed", type: "error" });
+    } finally {
+      handleClose();
+      navigate("/home");
+    }
   };
 
   const handleClose = () => {
@@ -207,5 +216,3 @@ const ButtonAppBar: React.FC<ButtonAppBarProps> = ({
     </Box>
   );
 };
-
-export default ButtonAppBar;

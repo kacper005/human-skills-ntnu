@@ -1,5 +1,8 @@
+import React from "react";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { TestCard } from "./TestCard";
 
 interface Test {
   id: number;
@@ -26,10 +29,7 @@ const testData: Test[] = [
   },
 ];
 
-import Typography from "@mui/material/Typography";
-import TestCard from "./TestCard";
-
-const TestCardGrid = () => {
+export const TestCardGrid: React.FC = () => {
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -55,5 +55,3 @@ const TestCardGrid = () => {
     </>
   );
 };
-
-export default TestCardGrid;

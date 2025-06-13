@@ -1,6 +1,6 @@
 import { axiosInstance } from "./axiosInstance";
-import { Campus } from "../enums/Campus";
-import { StudyLevel } from "../enums/StudyLevel";
+import { Campus } from "@enums/Campus";
+import { StudyLevel } from "@enums/StudyLevel";
 
 const BASE_URL = "/study-program";
 

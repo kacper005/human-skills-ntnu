@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {
   Paper,
   Table,
@@ -67,29 +67,37 @@ export function GenericTable<T extends { id: string | number }>({
           </TableHead>
 
           <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
-                <TableRow
-                  hover
-                  role="checkbox"
-                  tabIndex={-1}
-                  key={rowKey ? rowKey(row) : String(row.id)}
-                  onClick={() => onRowClick?.(row)}
-                >
-                  {columns.map((column) => {
-                    const value = row[column.id];
-                    const displayValue = column.format
-                      ? column.format(value, row)
-                      : String(value);
-                    return (
-                      <TableCell key={String(column.id)} align={column.align}>
-                        {displayValue}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))}
+            {rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} align="center">
+                  No data found
+                </TableCell>
+              </TableRow>
+            ) : (
+              rows
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row) => (
+                  <TableRow
+                    hover
+                    role="checkbox"
+                    tabIndex={-1}
+                    key={rowKey ? rowKey(row) : String(row.id)}
+                    onClick={() => onRowClick?.(row)}
+                  >
+                    {columns.map((column) => {
+                      const value = row[column.id];
+                      const displayValue = column.format
+                        ? column.format(value, row)
+                        : String(value);
+                      return (
+                        <TableCell key={String(column.id)} align={column.align}>
+                          {displayValue}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

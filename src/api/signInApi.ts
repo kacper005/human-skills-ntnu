@@ -1,5 +1,5 @@
-import { AuthProvider } from "../enums/AuthProvider";
 import { axiosInstance } from "./axiosInstance";
+import { AuthProvider } from "@enums/AuthProvider";
 
 const BASE_URL = "/authenticate";
 

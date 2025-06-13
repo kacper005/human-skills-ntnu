@@ -1,7 +1,7 @@
 import { axiosInstance } from "./axiosInstance";
-import { Role } from "../enums/Role";
-import { Gender } from "../enums/Gender";
-import { AuthProvider } from "../enums/AuthProvider";
+import { Role } from "@enums/Role";
+import { Gender } from "@enums/Gender";
+import { AuthProvider } from "@enums/AuthProvider";
 
 const BASE_URL = "/user";
 
@@ -28,15 +28,20 @@ export interface CreateUserDto {
   role?: Role;
 }
 
-export interface UpdateUserDto {
+export interface UpdateUserMeDto {
   firstName?: string;
   lastName?: string;
   gender?: Gender | "";
 }
 
+export interface UpdateUserDto {
+  id: number;
+  role: Role;
+}
+
 export const getUserMe = () => axiosInstance.get<User>(`${BASE_URL}/get-me`);
 
-export const updateUserMe = (data: UpdateUserDto) =>
+export const updateUserMe = (data: UpdateUserMeDto) =>
   axiosInstance.put<User>(`${BASE_URL}/update-me`, data);
 
 export const deleteUserMe = () => axiosInstance.delete(`${BASE_URL}/delete-me`);
@@ -49,8 +54,5 @@ export const getUserById = (id: string) =>
 export const createUser = (data: CreateUserDto) =>
   axiosInstance.post<CreateUserDto>(`${BASE_URL}/add`, data);
 
-export const updateUser = (id: string, data: UpdateUserDto) =>
-  axiosInstance.put<User>(`${BASE_URL}/${id}`, data);
-
-export const deleteUser = (id: string) =>
-  axiosInstance.delete(`${BASE_URL}/${id}`);
+export const updateUserRole = (id: number, role: Role) =>
+  axiosInstance.put<string>(`${BASE_URL}/update-role/${id}`, role);

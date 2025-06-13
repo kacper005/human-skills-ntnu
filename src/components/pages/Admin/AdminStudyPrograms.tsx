@@ -4,8 +4,8 @@ import {
   CreateStudyProgramDto,
   getStudyPrograms,
   StudyProgram,
-} from "../../api/studyProgramApi";
-import { Column, GenericTable } from "../organisms/GenericTable";
+} from "@api/studyProgramApi";
+import { Column, GenericTable } from "../../organisms/GenericTable";
 import {
   Button,
   Dialog,
@@ -15,13 +15,10 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
-import { getStudyLevelDisplayName, StudyLevel } from "../../enums/StudyLevel";
-import { Campus, getCampusDisplayName } from "../../enums/Campus";
-import {
-  updateStudyProgram,
-  deleteStudyProgram,
-} from "../../api/studyProgramApi";
-import { showToast } from "../atoms/Toast";
+import { updateStudyProgram, deleteStudyProgram } from "@api/studyProgramApi";
+import { showToast } from "@atoms/Toast";
+import { getStudyLevelDisplayName, StudyLevel } from "@enums/StudyLevel";
+import { Campus, getCampusDisplayName } from "@enums/Campus";
 
 const columns: Column<StudyProgram>[] = [
   { id: "name", label: "Program Name", minWidth: 150 },
@@ -39,8 +36,9 @@ const columns: Column<StudyProgram>[] = [
   },
 ];
 
-export const StudyPrograms: React.FC = () => {
+export const AdminStudyPrograms: React.FC = () => {
   const [programs, setPrograms] = React.useState<StudyProgram[]>([]);
+  const [searchQuery, setSearchQuery] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [isEdit, setIsEdit] = React.useState(false);
@@ -62,6 +60,12 @@ export const StudyPrograms: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const filteredPrograms = programs.filter((program) =>
+    `${program.name} ${program.campus} ${program.studyLevel}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
 
   React.useEffect(() => {
     fetchPrograms();
@@ -145,18 +149,29 @@ export const StudyPrograms: React.FC = () => {
 
   return (
     <div style={{ padding: 16 }}>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={openAddDialog}
-        sx={{ mb: 2 }}
+      <div
+        style={{
+          display: "flex",
+          marginBottom: 16,
+        }}
       >
-        Add New Study Program
-      </Button>
+        <Button variant="contained" color="primary" onClick={openAddDialog}>
+          Add New Study Program
+        </Button>
+      </div>
+
+      <TextField
+        label="Search"
+        variant="outlined"
+        size="small"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        sx={{ width: "100%", mt: 1, mb: 1 }}
+      />
 
       <GenericTable
         columns={columns}
-        rows={programs}
+        rows={filteredPrograms}
         onRowClick={openEditDialog}
       />
 

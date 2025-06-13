@@ -8,7 +8,7 @@ interface GameInfoProps {
   setGameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const GameInfo: React.FC<GameInfoProps> = ({
+export const GameInfo: React.FC<GameInfoProps> = ({
   gameInfo,
   gameModalOpen,
   setGameModalOpen,
@@ -85,5 +85,3 @@ const GameInfo: React.FC<GameInfoProps> = ({
     </Dialog>
   );
 };
-
-export default GameInfo;
