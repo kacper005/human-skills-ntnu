@@ -1,7 +1,7 @@
 import React from "react";
-import IntFluid from "./IntFluid";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import { IntFluid } from "./IntFluid";
 
 export const IntFluidController: React.FC = () => {
   const [choices, setChoices] = React.useState<string[]>([]);
@@ -11,10 +11,12 @@ export const IntFluidController: React.FC = () => {
     { grid: string; choices: string[]; correct: string }[]
   >([]);
   const [score, setScore] = React.useState<number>(0);
-  const [currentQuestion, setCurrentQuestion] = React.useState<number>(-1);
+  const [currentQuestion, setCurrentQuestion] = React.useState<number>(0);
   const [startTime, setStartTime] = React.useState<number>(Date.now());
   const [totalTime, setTotalTime] = React.useState<number>(0);
   const [isGameOver, setIsGameOver] = React.useState<boolean>(false);
+
+  const TILE_BASE_PATH = "/games/intFluid/tiles/";
 
   React.useEffect(() => {
     const fetchGameAssets = async () => {
@@ -22,72 +24,61 @@ export const IntFluidController: React.FC = () => {
       if (!res.ok) return;
 
       const files: string[] = await res.json();
-
       const totalSets = Math.floor(files.length / 7);
-      const selectedSets = new Set<number>();
 
-      while (selectedSets.size < 15) {
-        const randomSet = Math.floor(Math.random() * totalSets);
-        selectedSets.add(randomSet);
+      const selectedSets = new Set<number>();
+      while (selectedSets.size < 15 && selectedSets.size < totalSets) {
+        selectedSets.add(Math.floor(Math.random() * totalSets));
       }
 
-      const fetchedAssets = Array.from(selectedSets).map((setIndex) => {
-        const startIndex = setIndex * 7;
-        const gridPath = `/games/intFluid/tiles/${files[startIndex]}`;
-        const correctChoice = `/games/intFluid/tiles/${files[startIndex + 1]}`;
+      const sets = Array.from(selectedSets).map((index) => {
+        const startIndex = index * 7;
+        const grid = TILE_BASE_PATH + files[startIndex];
+        const correct = TILE_BASE_PATH + files[startIndex + 1];
         const otherChoices = files
           .slice(startIndex + 2, startIndex + 7)
-          .map((file) => `/games/intFluid/tiles/${file}`)
-          .sort(() => Math.random() - 0.5);
+          .map((f) => TILE_BASE_PATH + f);
 
-        const choicePaths = [correctChoice, ...otherChoices].sort(
+        const allChoices = [correct, ...otherChoices].sort(
           () => Math.random() - 0.5
         );
 
         return {
-          grid: gridPath,
-          choices: choicePaths,
-          correct: correctChoice,
+          grid,
+          correct,
+          choices: allChoices,
         };
       });
 
-      setAssets(fetchedAssets);
-      if (fetchedAssets.length > 0) {
-        loadNextBoard(fetchedAssets);
-      }
+      setAssets(sets);
+      setStartTime(Date.now());
     };
 
     fetchGameAssets();
 
-    // Start timer
-    setStartTime(Date.now());
     const interval = setInterval(() => {
       setTotalTime(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
 
-    return () => clearInterval(interval); // Cleanup on unmount
+    return () => clearInterval(interval);
   }, []);
 
-  const loadNextBoard = (remainingAssets: typeof assets) => {
-    if (remainingAssets.length > 0) {
-      const nextAsset = remainingAssets[0];
-      setGridImage(nextAsset.grid);
-      setChoices(nextAsset.choices);
-      setCorrectChoice(nextAsset.correct);
-
-      // Remove the current asset from the queue
-      setAssets(remainingAssets.slice(1));
-      setCurrentQuestion((prev) => prev + 1);
-    } else {
-      setIsGameOver(true); // Mark the game as over
+  React.useEffect(() => {
+    if (assets.length > 0 && currentQuestion < assets.length) {
+      const next = assets[currentQuestion];
+      setGridImage(next.grid);
+      setCorrectChoice(next.correct);
+      setChoices(next.choices);
+    } else if (assets.length > 0 && currentQuestion >= assets.length) {
+      setIsGameOver(true);
     }
-  };
+  }, [assets, currentQuestion]);
 
   const handleChoiceClick = (choice: string) => {
     if (choice === correctChoice) {
       setScore((prev) => prev + 1);
     }
-    loadNextBoard(assets);
+    setCurrentQuestion((prev) => prev + 1);
   };
 
   if (isGameOver) {
@@ -110,7 +101,7 @@ export const IntFluidController: React.FC = () => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      {/* Statistics */}
+      {/* Stats */}
       <Paper
         elevation={3}
         style={{
@@ -126,7 +117,7 @@ export const IntFluidController: React.FC = () => {
           {("0" + (totalTime % 60)).slice(-2)} minutes
         </Typography>
         <Typography variant="body1">
-          Question: {currentQuestion} / 15
+          Question: {currentQuestion + 1} / 15
         </Typography>
       </Paper>
 

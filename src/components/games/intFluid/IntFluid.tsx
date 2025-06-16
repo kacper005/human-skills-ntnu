@@ -9,7 +9,7 @@ interface IntFluidProps {
   onChoiceClick: (choice: string) => void;
 }
 
-const IntFluid: React.FC<IntFluidProps> = ({
+export const IntFluid: React.FC<IntFluidProps> = ({
   gridImage,
   choices,
   onChoiceClick,
@@ -85,5 +85,3 @@ const IntFluid: React.FC<IntFluidProps> = ({
     </div>
   );
 };
-
-export default IntFluid;
