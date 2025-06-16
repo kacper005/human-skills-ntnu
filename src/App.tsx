@@ -23,7 +23,7 @@ import { AdminGames } from "@pages/Admin/AdminGames";
 import { AdminStudyPrograms } from "@pages/Admin/AdminStudyPrograms";
 import theme from "./components/theme";
 import { Game } from "./components/Game";
-import Questionnaire from "./components/Questionnaire";
+import { Questionnaire } from "./components/Questionnaire";
 import { IntFluidController } from "./components/games/intFluid/IntFluidController";
 import { AppHeader } from "@organisms/AppHeader";
 import "./App.css";

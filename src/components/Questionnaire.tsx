@@ -12,20 +12,19 @@ import {
   Paper,
   Divider,
 } from "@mui/material";
-import questionsData from "../data/questionnaires/big5.json";
 
 interface Question {
   id: number;
   text: string;
 }
 
-const Questionnaire: React.FC = () => {
+export const Questionnaire: React.FC = () => {
   const [questions, setQuestions] = React.useState<Question[]>([]);
   const [answers, setAnswers] = React.useState<{ [key: number]: string }>({});
   const [submitted, setSubmitted] = React.useState(false);
 
   React.useEffect(() => {
-    setQuestions(questionsData.questions);
+    //setQuestions(questionsData.questions);
   }, []);
 
   const handleChange = (
@@ -179,5 +178,3 @@ const Questionnaire: React.FC = () => {
     </Container>
   );
 };
-
-export default Questionnaire;

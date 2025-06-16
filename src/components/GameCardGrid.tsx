@@ -53,26 +53,6 @@ const gameData: Game[] = [
         \n\nPress on the correct card option (out of 4 at the top) that matches the master card (bottom section) - following the identified pattern (color of items, number of items or shape of items); the pattern will change at irregular intervals.
         \n\nThe game will last for 2 minutes; the score will be calculated based on number of answers and number of correct answers i.e. a combination of speed and accuracy.`,
   },
-  {
-    id: 4,
-    title: "TestyMcTestFace",
-    description: "Identify pattern, apply pattern and detect pattern changes.",
-    type: "critical thinking",
-    difficulty: "easy",
-    image: "/game_images/troll.jpg",
-    descriptionFull: `This is a TestyMcTestFace Game: it records your ability to test, McFace and face the TestFace.
-        \n\nPress on the correct face option (out of 4 at the top) that matches the McTestFace - following the identified McFace (color of the Test, number of Testy's McFace or shape of McFace); the pattern will change at irregular intervals.
-        \n\nThe game will last for 2 minutes; the score will be calculated based on number of answers and number of correct answers i.e. a combination of speed and accuracy.`,
-  },
-  {
-    id: 5,
-    title: "Super Mario",
-    description: "Help Mario as he advertures through the Mushroom Kingdom.",
-    type: "Sidescroller",
-    difficulty: "Insane",
-    image: "/game_images/troll.jpg",
-    descriptionFull: `RAMPAGE!\n\n`,
-  },
 ];
 
 export const GameCardGrid: React.FC = () => {
