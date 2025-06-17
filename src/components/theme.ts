@@ -55,6 +55,21 @@ const themeOptions: ThemeOptions = {
       fontWeight: 600,
       lineHeight: 1.3,
     },
+    h3: {
+      fontSize: "1.25rem",
+      fontWeight: 500,
+      lineHeight: 1.4,
+    },
+    h4: {
+      fontSize: "1.125rem",
+      fontWeight: 500,
+      lineHeight: 1.5,
+    },
+    h5: {
+      fontSize: "1rem",
+      fontWeight: 500,
+      lineHeight: 1.5,
+    },
     body1: {
       fontSize: "1rem",
       fontWeight: 400,

@@ -1,8 +1,6 @@
 import React from "react";
-import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/material/styles";
 import { GameCard } from "./GameCard";
 import { GameInfo } from "./GameInfo";
 
@@ -58,7 +56,6 @@ const gameData: Game[] = [
 export const GameCardGrid: React.FC = () => {
   const [gameInfo, setGameInfo] = React.useState<string[]>(["", ""]);
   const [gameModalOpen, setGameModalOpen] = React.useState(false);
-  const theme = useTheme();
 
   return (
     <>
@@ -67,37 +64,34 @@ export const GameCardGrid: React.FC = () => {
         gameModalOpen={gameModalOpen}
         setGameModalOpen={setGameModalOpen}
       />
-      <Box
-        sx={{
-          flexGrow: 1,
-          padding: 3,
-          backgroundColor:
-            theme.palette.mode === "dark" ? "#121212" : "#f5f5f5",
-        }}
+
+      <Typography
+        fontWeight={"bold"}
+        variant="h2"
+        color="secondary"
+        paddingBottom="24px"
       >
-        <Typography variant="h4" color="secondary" paddingBottom="24px">
-          <Box sx={{ fontWeight: "bold", m: 1 }}>Cognitive Games</Box>
-        </Typography>
-        <Grid
-          container
-          spacing={{ xs: 3, sm: 3, md: 3 }}
-          columns={{ xs: 2, sm: 4, md: 8, lg: 12 }}
-        >
-          {gameData.map((game, index) => (
-            <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
-              <GameCard
-                title={game.title}
-                description={game.description}
-                type={game.type}
-                difficulty={game.difficulty}
-                descriptionFull={game.descriptionFull}
-                setGameInfo={setGameInfo}
-                setGameModalOpen={setGameModalOpen}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
+        Cognitive Games
+      </Typography>
+      <Grid
+        container
+        spacing={{ xs: 3, sm: 3, md: 3 }}
+        columns={{ xs: 2, sm: 4, md: 8, lg: 12 }}
+      >
+        {gameData.map((game, index) => (
+          <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
+            <GameCard
+              title={game.title}
+              description={game.description}
+              type={game.type}
+              difficulty={game.difficulty}
+              descriptionFull={game.descriptionFull}
+              setGameInfo={setGameInfo}
+              setGameModalOpen={setGameModalOpen}
+            />
+          </Grid>
+        ))}
+      </Grid>
     </>
   );
 };

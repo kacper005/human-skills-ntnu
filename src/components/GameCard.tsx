@@ -39,12 +39,13 @@ export const GameCard: React.FC<GameCardProps> = ({
           transform: "scale(1.01)",
           boxShadow: theme.shadows[3],
         },
+        maxWidth: 435,
       }}
     >
       <CardContent>
         <Typography
           gutterBottom
-          variant="h5"
+          variant="h3"
           fontWeight="bold"
           component="div"
           color="secondary"

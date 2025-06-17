@@ -7,11 +7,13 @@ import {
   DialogTitle,
   MenuItem,
   TextField,
+  Typography,
 } from "@mui/material";
 import { getUsers, updateUserRole, UpdateUserDto, User } from "@api/userApi";
 import { getRoleDisplayName, Role } from "@enums/Role";
 import { showToast } from "@atoms/Toast";
 import { GenericTable } from "@organisms/GenericTable";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 
 const columns: {
   id: keyof User;
@@ -93,10 +95,13 @@ export const AdminUsers: React.FC = () => {
     }));
   };
 
-  if (loading) return <p>Loading users...</p>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div>
+      <Typography variant="h2" gutterBottom>
+        Users
+      </Typography>
       <GenericTable
         columns={columns}
         rows={users}

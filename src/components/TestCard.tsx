@@ -1,24 +1,19 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Typography, Button } from "@mui/material";
 
 interface TestCardProps {
   title: string;
   description: string;
   type: string;
+  onClick?: () => void;
 }
 
 export const TestCard: React.FC<TestCardProps> = ({
   title,
   description,
   type,
+  onClick = () => {},
 }) => {
-  const navigate = useNavigate();
-
-  // React.useEffect(() => {
-  //   // Any side effects or navigation logic can go here
-  // }, [navigate]);
-
   return (
     <Card
       elevation={0}
@@ -29,12 +24,15 @@ export const TestCard: React.FC<TestCardProps> = ({
           transform: "scale(1.01)",
           boxShadow: 3,
         },
+        width: "100%",
+        maxWidth: 435,
+        mt: 1,
       }}
     >
       <CardContent>
         <Typography
           gutterBottom
-          variant="h5"
+          variant="h3"
           fontWeight="bold"
           component="div"
           color="secondary"
@@ -56,13 +54,7 @@ export const TestCard: React.FC<TestCardProps> = ({
           variant="contained"
           color="secondary"
           style={{ marginTop: "12px", width: "100%" }}
-          onClick={() => {
-            if (type === "questionnaire") {
-              navigate("/test");
-            } else if (type === "game") {
-              navigate("/test2");
-            }
-          }}
+          onClick={onClick}
         >
           Take Test
         </Button>

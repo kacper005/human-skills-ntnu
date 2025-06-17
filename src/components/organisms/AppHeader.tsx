@@ -102,11 +102,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             component={Link}
             to="/home"
           >
-            <img
-              src="/HumanSkillsLogo.png"
-              alt="Logo"
-              style={{ height: 64, marginRight: 32 }}
-            />
+            <img src="/HumanSkillsLogo.png" alt="Logo" style={{ height: 64 }} />
           </Typography>
 
           <Box sx={{ flexGrow: 1 }} />

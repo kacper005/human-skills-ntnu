@@ -19,6 +19,7 @@ import { updateStudyProgram, deleteStudyProgram } from "@api/studyProgramApi";
 import { showToast } from "@atoms/Toast";
 import { getStudyLevelDisplayName, StudyLevel } from "@enums/StudyLevel";
 import { Campus, getCampusDisplayName } from "@enums/Campus";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 
 const columns: Column<StudyProgram>[] = [
   { id: "name", label: "Program Name", minWidth: 150 },
@@ -145,7 +146,7 @@ export const AdminStudyPrograms: React.FC = () => {
     });
   };
 
-  if (loading) return <p>Loading study programs...</p>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div style={{ padding: 16 }}>

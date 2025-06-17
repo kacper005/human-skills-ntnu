@@ -11,8 +11,8 @@ import {
 const adminLinks = [
   { title: "Study Programs", path: "/admin/study-programs" },
   { title: "Users", path: "/admin/users" },
-  { title: "Tests", path: "/admin/tests" },
-  { title: "Games", path: "/admin/games" },
+  { title: "Test Templates", path: "/admin/test-templates" },
+  { title: "Game Templates", path: "/admin/game-templates" },
 ];
 
 export const Admin: React.FC = () => {

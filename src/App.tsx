@@ -11,6 +11,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useAuth } from "@hooks/useAuth";
 import { ProtectedRoute } from "@context/ProtectedRoute";
 import { AdminRoute } from "@context/AdminRoute";
+import { ScrollToTop } from "@hooks/ScrollToTop";
 import { Home } from "@pages/Home";
 import { SignIn } from "@pages/SignIn";
 import { SignUp } from "@pages/SignUp";
@@ -18,8 +19,8 @@ import { NotFound } from "@pages/NotFound";
 import { Admin } from "@pages/Admin/Admin";
 import { UserProfile } from "@pages/UserProfile";
 import { AdminUsers } from "@pages/Admin/AdminUsers";
-import { AdminTests } from "@pages/Admin/AdminTests";
-import { AdminGames } from "@pages/Admin/AdminGames";
+import { AdminTestTemplates } from "@pages/Admin/AdminTestTemplates";
+import { AdminGameTemplates } from "@pages/Admin/AdminGameTemplates";
 import { AdminStudyPrograms } from "@pages/Admin/AdminStudyPrograms";
 import theme from "./components/theme";
 import { Game } from "./components/Game";
@@ -50,6 +51,7 @@ export const App: React.FC = () => {
     <ThemeProvider theme={muiTheme}>
       <CssBaseline /> {/* MUI global styling reset */}
       <Router>
+        <ScrollToTop />
         <AppHeader
           setIsOpen={setIsOpen}
           isLoggedIn={isLoggedIn}
@@ -77,8 +79,14 @@ export const App: React.FC = () => {
                 element={<AdminStudyPrograms />}
               />
               <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/tests" element={<AdminTests />} />
-              <Route path="/admin/games" element={<AdminGames />} />
+              <Route
+                path="/admin/test-templates"
+                element={<AdminTestTemplates />}
+              />
+              <Route
+                path="/admin/game-templates"
+                element={<AdminGameTemplates />}
+              />
             </Route>
           </Routes>
           <ToastContainer />

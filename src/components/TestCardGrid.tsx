@@ -1,57 +1,75 @@
 import React from "react";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { TestCard } from "./TestCard";
+import { TestTemplate } from "@/api/testTemplate";
+import { TestInfoModal } from "./molecules/TestInfoModal";
+import { useNavigate } from "react-router-dom";
+import { getTestOptionTypeDisplayName } from "@/enums/TestOptionType";
+import { showToast } from "./atoms/Toast";
 
-interface Test {
-  id: number;
-  key: string;
-  title: string;
-  description: string;
-  type: string;
+interface Props {
+  testTemplates: TestTemplate[];
 }
 
-const testData: Test[] = [
-  {
-    id: 1,
-    key: "big5",
-    title: "BIG-5",
-    description: "Personality Test, BIG-5",
-    type: "questionnaire",
-  },
-  {
-    id: 2,
-    key: "intFluid",
-    title: "Intelligence Fluid",
-    description: "Intelligence Fluid Test",
-    type: "game",
-  },
-];
+export const TestCardGrid: React.FC<Props> = ({ testTemplates }) => {
+  const [selectedTest, setSelectedTest] = React.useState<TestTemplate | null>(
+    null
+  );
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const navigate = useNavigate();
 
-export const TestCardGrid: React.FC = () => {
+  const handleCardClick = (template: TestTemplate) => {
+    setSelectedTest(template);
+    setModalOpen(true);
+  };
+
+  const handleStartTest = () => {
+    setModalOpen(false);
+    if (selectedTest) {
+      if (selectedTest.testType === "BIG_5") {
+        navigate("/test");
+      } else {
+        showToast({ message: "Unsupported test type", type: "warning" });
+      }
+    }
+  };
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        <Typography variant="h4" color="secondary" paddingBottom="24px">
+        <Typography variant="h2" color="secondary" paddingBottom="24px">
           <Box sx={{ fontWeight: "bold", m: 1 }}>Tests</Box>
         </Typography>
         <Grid
+          item
           container
           spacing={{ xs: 3, sm: 3, md: 3 }}
           columns={{ xs: 2, sm: 2, md: 8, lg: 12 }}
         >
-          {Array.from({ length: testData.length }).map((_, index) => (
-            <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
+          {testTemplates.map((template, index) => (
+            <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
               <TestCard
-                title={testData[index].title}
-                description={testData[index].description}
-                type={testData[index].type}
+                title={template.name}
+                description={template.description}
+                type={getTestOptionTypeDisplayName(template.optionType)}
+                onClick={() => handleCardClick(template)}
               />
             </Grid>
           ))}
         </Grid>
       </Box>
+
+      {selectedTest && (
+        <TestInfoModal
+          open={modalOpen}
+          title={selectedTest.name}
+          description={selectedTest.description}
+          onClose={() => setModalOpen(false)}
+          onStart={handleStartTest}
+        />
+      )}
     </>
   );
 };

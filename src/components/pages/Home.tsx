@@ -1,22 +1,54 @@
 import React from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { TestCardGrid } from "../TestCardGrid";
 import { GameCardGrid } from "../GameCardGrid";
+import { useAuth } from "@/hooks/useAuth";
+import { getAllTestTemplates, TestTemplate } from "@/api/testTemplate";
+import { showToast } from "@/components/atoms/Toast";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 
 export const Home: React.FC = () => {
   const theme = useTheme();
+  const { user } = useAuth();
+  const [testTemplates, setTestTemplates] = React.useState<TestTemplate[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getAllTestTemplates();
+        setTestTemplates(response.data);
+      } catch (err: any) {
+        showToast({ message: "Failed to fetch test templates", type: "error" });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
         backgroundColor: theme.palette.background.default,
-        padding: 3,
       }}
     >
-      <GameCardGrid />
+      <Typography color="secondary" fontWeight="bold" variant="h1">
+        Welcome {user?.firstName}!
+      </Typography>
       <br />
-      <TestCardGrid />
+
+      <br />
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          {" "}
+          <TestCardGrid testTemplates={testTemplates} /> <br />
+          <GameCardGrid />
+        </>
+      )}
     </Box>
   );
 };
