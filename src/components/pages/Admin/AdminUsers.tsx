@@ -109,9 +109,7 @@ export const AdminUsers: React.FC = () => {
       />
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>
-          {isEdit ? "Edit Study Program" : "Add Study Program"}
-        </DialogTitle>
+        <DialogTitle>Edit User Role</DialogTitle>
         <DialogContent>
           <TextField
             select

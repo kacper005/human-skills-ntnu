@@ -6,7 +6,6 @@ import {
   TextField,
   Button,
   Grid,
-  CircularProgress,
   MenuItem,
 } from "@mui/material";
 import { useAuth } from "@hooks/useAuth";
@@ -22,6 +21,7 @@ import { getRoleDisplayName } from "@enums/Role";
 import { Gender, getGenderDisplayName } from "@enums/Gender";
 import { showToast } from "@atoms/Toast";
 import { ConfirmDialog } from "@atoms/ConfirmDialog";
+import { LoadingSpinner } from "../atoms/LoadingSpinner";
 
 export const UserProfile: React.FC = () => {
   const { user, loading, logout } = useAuth();
@@ -105,7 +105,6 @@ export const UserProfile: React.FC = () => {
   };
 
   const handleStudentProfileSave = async () => {
-    console.log("Saving student profile with data:", formData);
     try {
       await createStudentProfile(formData);
       showToast({ message: "Student profile saved", type: "success" });
@@ -132,12 +131,7 @@ export const UserProfile: React.FC = () => {
   };
 
   if (loading || !user) {
-    return (
-      <div>
-        <CircularProgress />
-        <p>Loading user profile...</p>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -162,7 +156,7 @@ export const UserProfile: React.FC = () => {
                 flexDirection: "column",
               }}
             >
-              <Typography variant="h5" gutterBottom>
+              <Typography variant="h5" gutterBottom sx={{ marginBottom: 2 }}>
                 User Profile
               </Typography>
 
@@ -284,7 +278,7 @@ export const UserProfile: React.FC = () => {
                   flexDirection: "column",
                 }}
               >
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h5" gutterBottom sx={{ marginBottom: 2 }}>
                   Student Profile
                 </Typography>
 

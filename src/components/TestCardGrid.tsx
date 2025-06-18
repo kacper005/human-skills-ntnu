@@ -40,7 +40,7 @@ export const TestCardGrid: React.FC<Props> = ({ testTemplates }) => {
     <>
       <Box sx={{ flexGrow: 1 }}>
         <Typography variant="h2" color="secondary" paddingBottom="24px">
-          <Box sx={{ fontWeight: "bold", m: 1 }}>Tests</Box>
+          <Box sx={{ fontWeight: "bold" }}>Tests</Box>
         </Typography>
         <Grid
           item

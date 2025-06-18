@@ -19,6 +19,7 @@ import { NotFound } from "@pages/NotFound";
 import { Admin } from "@pages/Admin/Admin";
 import { UserProfile } from "@pages/UserProfile";
 import { AdminUsers } from "@pages/Admin/AdminUsers";
+import { MyTestSessions } from "@pages/MyTestSessions";
 import { AdminTestTemplates } from "@pages/Admin/AdminTestTemplates";
 import { AdminGameTemplates } from "@pages/Admin/AdminGameTemplates";
 import { AdminStudyPrograms } from "@pages/Admin/AdminStudyPrograms";
@@ -71,6 +72,7 @@ export const App: React.FC = () => {
 
             <Route element={<ProtectedRoute />}>
               <Route path="/user-profile" element={<UserProfile />} />
+              <Route path="/my-test-sessions" element={<MyTestSessions />} />
             </Route>
             <Route element={<AdminRoute />}>
               <Route path="/admin" element={<Admin />} />

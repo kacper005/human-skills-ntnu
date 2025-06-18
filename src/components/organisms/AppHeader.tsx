@@ -17,6 +17,7 @@ import {
   // DarkMode,
   // LightMode,
 } from "@mui/icons-material";
+import QuizIcon from "@mui/icons-material/Quiz";
 import { showToast } from "@atoms/Toast";
 
 interface AppHeaderProps {
@@ -163,13 +164,23 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   <Divider />
 
                   {user?.role === "ADMIN" && (
-                    <MenuItem onClick={() => navigate("/admin")}>
-                      <ListItemIcon>
-                        <Settings fontSize="small" />
-                      </ListItemIcon>
-                      Admin Dashboard
-                    </MenuItem>
+                    <>
+                      <MenuItem onClick={() => navigate("/admin")}>
+                        <ListItemIcon>
+                          <Settings fontSize="small" />
+                        </ListItemIcon>
+                        Admin Dashboard
+                      </MenuItem>
+                      <Divider />
+                    </>
                   )}
+
+                  <MenuItem onClick={() => navigate("/my-test-sessions")}>
+                    <ListItemIcon>
+                      <QuizIcon fontSize="small" />
+                    </ListItemIcon>
+                    My Test Sessions
+                  </MenuItem>
 
                   {/* Dark Mode Toggle
                   <MenuItem onClick={handleDarkMode}>
@@ -182,6 +193,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     </ListItemIcon>
                     {darkMode ? "Light Mode" : "Dark Mode"}
                   </MenuItem> */}
+
+                  <Divider />
 
                   {/*  Logout Button */}
                   <MenuItem onClick={handleLogout}>

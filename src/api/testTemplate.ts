@@ -14,6 +14,10 @@ export interface TestTemplate {
   questions: TestQuestion[];
 }
 
+export interface UpdateTestTemplateDto {
+  description: string;
+}
+
 export const getAllTestTemplates = () =>
   axiosInstance.get<TestTemplate[]>(`${BASE_URL}/get-all`);
 
@@ -22,3 +26,18 @@ export const getTestTemplateById = (id: number) =>
 
 export const getTestTemplatesByType = (testType: TestType) =>
   axiosInstance.get<TestTemplate>(`${BASE_URL}/get-by-test-type/${testType}`);
+
+export const updateTestTemplateDescription = (
+  id: number,
+  description: string
+) => {
+  return axiosInstance.put(
+    `${BASE_URL}/update-description/${id}`,
+    description,
+    {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    }
+  );
+};
