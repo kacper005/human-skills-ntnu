@@ -22,6 +22,7 @@ import { Gender, getGenderDisplayName } from "@enums/Gender";
 import { showToast } from "@atoms/Toast";
 import { ConfirmDialog } from "@atoms/ConfirmDialog";
 import { LoadingSpinner } from "../atoms/LoadingSpinner";
+import { getCampusDisplayName } from "@enums/Campus";
 
 export const UserProfile: React.FC = () => {
   const { user, loading, logout } = useAuth();
@@ -299,7 +300,8 @@ export const UserProfile: React.FC = () => {
                         </MenuItem>
                         {studyPrograms.map((program) => (
                           <MenuItem key={program.id} value={program.id}>
-                            {program.name}
+                            {program.name}{" "}
+                            {getCampusDisplayName(program.campus)}
                           </MenuItem>
                         ))}
                       </TextField>

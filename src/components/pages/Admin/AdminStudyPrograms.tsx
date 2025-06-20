@@ -19,7 +19,7 @@ import { updateStudyProgram, deleteStudyProgram } from "@api/studyProgramApi";
 import { showToast } from "@atoms/Toast";
 import { getStudyLevelDisplayName, StudyLevel } from "@enums/StudyLevel";
 import { Campus, getCampusDisplayName } from "@enums/Campus";
-import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
+import { LoadingSpinner } from "@atoms/LoadingSpinner";
 
 const columns: Column<StudyProgram>[] = [
   { id: "name", label: "Program Name", minWidth: 150 },
@@ -222,14 +222,15 @@ export const AdminStudyPrograms: React.FC = () => {
           </TextField>
         </DialogContent>
         <DialogActions>
-          {isEdit && (
-            <Button variant="outlined" onClick={handleDelete} color="error">
-              Delete
-            </Button>
-          )}
           <Button variant="outlined" onClick={() => setDialogOpen(false)}>
             Cancel
           </Button>
+          {isEdit && (
+            <Button variant="contained" onClick={handleDelete} color="error">
+              Delete
+            </Button>
+          )}
+
           <Button onClick={handleSave} variant="contained">
             Save
           </Button>

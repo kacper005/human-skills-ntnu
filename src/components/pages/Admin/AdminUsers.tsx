@@ -13,7 +13,7 @@ import { getUsers, updateUserRole, UpdateUserDto, User } from "@api/userApi";
 import { getRoleDisplayName, Role } from "@enums/Role";
 import { showToast } from "@atoms/Toast";
 import { GenericTable } from "@organisms/GenericTable";
-import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
+import { LoadingSpinner } from "@atoms/LoadingSpinner";
 
 const columns: {
   id: keyof User;

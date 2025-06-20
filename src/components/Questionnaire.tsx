@@ -1,30 +1,42 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Container,
   Typography,
+  Container,
   RadioGroup,
   FormControlLabel,
   Radio,
   FormControl,
   FormLabel,
-  Button,
   Box,
   Paper,
   Divider,
   Tooltip,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
 } from "@mui/material";
-import { TestQuestion } from "@/api/testQuestion";
-import { getTestTemplatesByType } from "@/api/testTemplate";
-import { TestType } from "@/enums/TestType";
-import { LoadingSpinner } from "./atoms/LoadingSpinner";
-import { showToast } from "./atoms/Toast";
+
+import { TestQuestion } from "@api/testQuestion";
 import {
   createNewTestSession,
   CreateTestSessionRequest,
-} from "@/api/testSession";
-import { CreateTestChoiceRequest } from "@/api/testChoice";
+  getTestSessionFormattedById,
+} from "@api/testSession";
+import { getTestTemplatesByType } from "@api/testTemplate";
+import { CreateTestChoiceRequest, TestChoiceView } from "@api/testChoice";
+import { TestType } from "@enums/TestType";
+import { showToast } from "./atoms/Toast";
+import { LoadingSpinner } from "./atoms/LoadingSpinner";
+import { InfoTooltip } from "./atoms/InfoTooltip";
 
 export const Questionnaire: React.FC = () => {
+  // TODO Refactor this component
+  const QUESTIONS_PER_PAGE = 10;
+  const navigate = useNavigate();
   const [questions, setQuestions] = React.useState<TestQuestion[]>([]);
   const [answers, setAnswers] = React.useState<{ [key: number]: string }>({});
   const [submitted, setSubmitted] = React.useState(false);
@@ -33,11 +45,10 @@ export const Questionnaire: React.FC = () => {
   const [testTemplateId, setTestTemplateId] = React.useState<number | null>(
     null
   );
-
-  const QUESTIONS_PER_PAGE = 10;
+  const [resultSummary, setResultSummary] = React.useState<any | null>(null);
 
   React.useEffect(() => {
-    const fetchBig5Questions = async () => {
+    const fetchTestQuestions = async () => {
       sessionStorage.setItem(
         "questionnaireStartTime",
         new Date().toISOString()
@@ -67,7 +78,7 @@ export const Questionnaire: React.FC = () => {
       }
     };
 
-    fetchBig5Questions();
+    fetchTestQuestions();
   }, []);
 
   const handleChange = (
@@ -85,6 +96,19 @@ export const Questionnaire: React.FC = () => {
       (question) =>
         answers[question.id] !== undefined && answers[question.id] !== ""
     );
+  };
+
+  const fetchTestSessionResult = async (sessionId: number) => {
+    setLoading(true);
+    try {
+      const response = await getTestSessionFormattedById(sessionId);
+      setResultSummary(response.data);
+    } catch (error) {
+      console.error("Failed to fetch test session result:", error);
+      showToast({ message: "Failed to load test results", type: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -112,14 +136,21 @@ export const Questionnaire: React.FC = () => {
         showToast({ message: "Test template ID not found.", type: "error" });
         return;
       }
+
       const payload: CreateTestSessionRequest = {
         testTemplateId: testTemplateId,
         startTime: parsedStartTime.toISOString(),
         endTime,
         choices,
       };
-      await createNewTestSession(payload);
+
+      const response = await createNewTestSession(payload);
+      const testSessionId = response.data;
+
       showToast({ message: "Test submitted successfully!", type: "success" });
+
+      fetchTestSessionResult(testSessionId);
+
       setSubmitted(true);
     } catch (error: any) {
       console.error("Failed to submit test session:", error);
@@ -164,6 +195,22 @@ export const Questionnaire: React.FC = () => {
     }
   };
 
+  const handleExportJSON = () => {
+    if (!resultSummary) return;
+
+    const jsonStr = JSON.stringify(resultSummary, null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Test-session-${resultSummary.id}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   const startIndex = (currentPage - 1) * QUESTIONS_PER_PAGE;
   const paginatedQuestions = questions.slice(
     startIndex,
@@ -177,12 +224,71 @@ export const Questionnaire: React.FC = () => {
         <Box display="flex" flexDirection="column" alignItems="center">
           <Paper
             elevation={0}
-            sx={{ width: "100%", padding: "16px", borderRadius: 5 }}
+            sx={{ width: "100%", padding: "24px", borderRadius: 5 }}
           >
-            <Typography variant="h5" component="h1" gutterBottom align="center">
-              Thank you for taking this test!
+            <Typography variant="h3" component="h1" gutterBottom align="center">
+              Thank you for completing the test!
             </Typography>
-            {/* TODO: give user result summary */}
+            <Divider sx={{ my: 2 }} />
+
+            {resultSummary ? (
+              <>
+                <Typography variant="h4" align="center">
+                  🧾 Test: {resultSummary.testName}
+                </Typography>
+                <Typography variant="h4" align="center">
+                  📅 Taken: {new Date(resultSummary.endTime).toLocaleString()}
+                </Typography>
+                <Box
+                  display={"flex"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  mt={2}
+                  gap={2}
+                >
+                  <Button variant="contained" onClick={handleExportJSON}>
+                    Export JSON
+                  </Button>
+                  <Button variant="outlined" onClick={() => navigate("/")}>
+                    Back to Home
+                  </Button>
+                  <InfoTooltip
+                    title={
+                      "You can export your test result later, visiting 'My Test Sessions' page. "
+                    }
+                  />
+                </Box>
+
+                <Table sx={{ mt: 3 }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <strong>#</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Question</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Your Answer</strong>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {resultSummary.choices.map(
+                      (choice: TestChoiceView, index: number) => (
+                        <TableRow key={index}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{choice.question}</TableCell>
+                          <TableCell>{choice.answer}</TableCell>
+                        </TableRow>
+                      )
+                    )}
+                  </TableBody>
+                </Table>
+              </>
+            ) : (
+              <LoadingSpinner />
+            )}
           </Paper>
         </Box>
       </Container>
@@ -313,7 +419,6 @@ export const Questionnaire: React.FC = () => {
             </FormControl>
           ))}
 
-          {/* Pagination controls */}
           <Box
             display="flex"
             justifyContent="center"

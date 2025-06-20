@@ -3,12 +3,12 @@ import {
   getAllTestTemplates,
   TestTemplate,
   updateTestTemplateDescription,
-} from "@/api/testTemplate";
-import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
-import { showToast } from "@/components/atoms/Toast";
-import { GenericTable } from "@/components/organisms/GenericTable";
-import { getTestOptionTypeDisplayName } from "@/enums/TestOptionType";
-import { getTestTypeDisplayName } from "@/enums/TestType";
+} from "@api/testTemplate";
+import { LoadingSpinner } from "@atoms/LoadingSpinner";
+import { showToast } from "@atoms/Toast";
+import { GenericTable } from "@organisms/GenericTable";
+import { getTestOptionTypeDisplayName } from "@enums/TestOptionType";
+import { getTestTypeDisplayName } from "@enums/TestType";
 import {
   Button,
   Dialog,

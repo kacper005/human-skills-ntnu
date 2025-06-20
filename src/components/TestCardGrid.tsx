@@ -3,10 +3,10 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { TestCard } from "./TestCard";
-import { TestTemplate } from "@/api/testTemplate";
+import { TestTemplate } from "@api/testTemplate";
 import { TestInfoModal } from "./molecules/TestInfoModal";
 import { useNavigate } from "react-router-dom";
-import { getTestOptionTypeDisplayName } from "@/enums/TestOptionType";
+import { getTestOptionTypeDisplayName } from "@enums/TestOptionType";
 import { showToast } from "./atoms/Toast";
 
 interface Props {
@@ -28,10 +28,16 @@ export const TestCardGrid: React.FC<Props> = ({ testTemplates }) => {
   const handleStartTest = () => {
     setModalOpen(false);
     if (selectedTest) {
-      if (selectedTest.testType === "BIG_5") {
-        navigate("/test");
-      } else {
-        showToast({ message: "Unsupported test type", type: "warning" });
+      switch (selectedTest.testType) {
+        case "BIG_5":
+          navigate("/test/big5");
+          break;
+        case "INTELLIGENCE_FLUID":
+          navigate("/test/int-fluid");
+          break;
+        default:
+          showToast({ message: "Unsupported test type", type: "warning" });
+          break;
       }
     }
   };

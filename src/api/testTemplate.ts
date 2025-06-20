@@ -1,7 +1,7 @@
-import { TestType } from "@/enums/TestType";
+import { TestType } from "@enums/TestType";
 import { axiosInstance } from "./axiosInstance";
 import { TestQuestion } from "./testQuestion";
-import { TestOptionType } from "@/enums/TestOptionType";
+import { TestOptionType } from "@enums/TestOptionType";
 
 const BASE_URL = "/test";
 

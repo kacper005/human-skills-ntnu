@@ -41,5 +41,11 @@ export const getAllTestSessions = () =>
 export const getAllTestSessionsFormatted = () =>
   axiosInstance.get<TestSessionView[]>(`${BASE_URL}/formatted`);
 
+export const getTestSessionFormattedById = (id: number) =>
+  axiosInstance.get<TestSessionView>(`${BASE_URL}/formatted/${id}`);
+
 export const createNewTestSession = (request: CreateTestSessionRequest) =>
-  axiosInstance.post<TestSession>(`${BASE_URL}/add`, request);
+  axiosInstance.post<number>(`${BASE_URL}/add`, request);
+
+export const deleteTestSession = (id: number) =>
+  axiosInstance.delete(`${BASE_URL}/delete/${id}`);

@@ -1,4 +1,4 @@
-import { TestOptionType } from "@/enums/TestOptionType";
+import { TestOptionType } from "@enums/TestOptionType";
 
 export interface TestOption {
   id: number;
