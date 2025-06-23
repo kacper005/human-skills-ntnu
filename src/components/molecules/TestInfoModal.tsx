@@ -30,11 +30,6 @@ export const TestInfoModal: React.FC<TestInfoModalProps> = ({
         <Typography variant="body1" sx={{ mb: 2 }}>
           {description}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          This test will help assess your personality traits. Please answer all
-          questions honestly. You won’t be able to change answers once
-          submitted.
-        </Typography>
       </DialogContent>
 
       <DialogActions>
@@ -42,7 +37,7 @@ export const TestInfoModal: React.FC<TestInfoModalProps> = ({
           Cancel
         </Button>
         <Button onClick={onStart} variant="contained" color="primary">
-          Start Test
+          Start
         </Button>
       </DialogActions>
     </Dialog>

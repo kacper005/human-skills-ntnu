@@ -1,9 +1,22 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import { IntFluid } from "./IntFluid";
+import { getTestTemplatesByType } from "@api/testTemplate";
+import { TestType } from "@enums/TestType";
+import { TestQuestion } from "@api/testQuestion";
+import { showToast } from "@atoms/Toast";
+import { LoadingSpinner } from "@atoms/LoadingSpinner";
+import {
+  createNewTestSession,
+  CreateTestSessionRequest,
+} from "@api/testSession";
+import { CreateTestChoiceRequest } from "@api/testChoice";
 
 export const IntFluidController: React.FC = () => {
+  const navigate = useNavigate();
   const [choices, setChoices] = React.useState<string[]>([]);
   const [gridImage, setGridImage] = React.useState<string>("");
   const [correctChoice, setCorrectChoice] = React.useState<string>("");
@@ -14,54 +27,79 @@ export const IntFluidController: React.FC = () => {
   const [currentQuestion, setCurrentQuestion] = React.useState<number>(0);
   const [startTime, setStartTime] = React.useState<number>(Date.now());
   const [totalTime, setTotalTime] = React.useState<number>(0);
-  const [isGameOver, setIsGameOver] = React.useState<boolean>(false);
+  const [_, setIsGameOver] = React.useState<boolean>(false);
+  const [testTemplateId, setTestTemplateId] = React.useState<number | null>(
+    null
+  );
+  const [questions, setQuestions] = React.useState<TestQuestion[]>([]);
+  const [answers, setAnswers] = React.useState<number[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
   const TILE_BASE_PATH = "/games/intFluid/tiles/";
 
   React.useEffect(() => {
-    const fetchGameAssets = async () => {
-      const res = await fetch("/games/intFluid/filelist.json");
-      if (!res.ok) return;
-
-      const files: string[] = await res.json();
-      const totalSets = Math.floor(files.length / 7);
-
-      const selectedSets = new Set<number>();
-      while (selectedSets.size < 15 && selectedSets.size < totalSets) {
-        selectedSets.add(Math.floor(Math.random() * totalSets));
-      }
-
-      const sets = Array.from(selectedSets).map((index) => {
-        const startIndex = index * 7;
-        const grid = TILE_BASE_PATH + files[startIndex];
-        const correct = TILE_BASE_PATH + files[startIndex + 1];
-        const otherChoices = files
-          .slice(startIndex + 2, startIndex + 7)
-          .map((f) => TILE_BASE_PATH + f);
-
-        const allChoices = [correct, ...otherChoices].sort(
-          () => Math.random() - 0.5
+    const fetchTestQuestions = async () => {
+      try {
+        const response = await getTestTemplatesByType(
+          TestType.INTELLIGENCE_FLUID
         );
+        const template = response.data;
+        setTestTemplateId(template.id);
 
-        return {
-          grid,
-          correct,
-          choices: allChoices,
-        };
-      });
-
-      setAssets(sets);
-      setStartTime(Date.now());
+        if (template.questions && template.questions.length > 0) {
+          setQuestions(template.questions);
+        } else {
+          showToast({
+            message: "No questions found for this test type.",
+            type: "error",
+          });
+        }
+      } catch (err: any) {
+        console.error(err);
+        showToast({
+          message: err.response?.data?.message || "Failed to fetch questions",
+          type: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchGameAssets();
+    fetchTestQuestions();
+  }, []);
 
+  React.useEffect(() => {
+    if (questions.length === 0) return;
+
+    const assets = questions.slice(0, 15).map((q) => {
+      const folderName = q.questionText.split("_")[0];
+      const grid = `${TILE_BASE_PATH}${folderName}/${q.questionText}`;
+
+      const correctOption = q.options[0];
+      const correct = `${TILE_BASE_PATH}${folderName}/${correctOption.optionText}`;
+
+      const otherChoices = q.options
+        .slice(1)
+        .map((opt) => `${TILE_BASE_PATH}${folderName}/${opt.optionText}`);
+
+      const allChoices = [correct, ...otherChoices].sort(
+        () => Math.random() - 0.5
+      );
+
+      return { grid, correct, choices: allChoices };
+    });
+
+    setAssets(assets);
+    setStartTime(Date.now());
+  }, [questions]);
+
+  React.useEffect(() => {
     const interval = setInterval(() => {
       setTotalTime(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [startTime]);
 
   React.useEffect(() => {
     if (assets.length > 0 && currentQuestion < assets.length) {
@@ -69,8 +107,6 @@ export const IntFluidController: React.FC = () => {
       setGridImage(next.grid);
       setCorrectChoice(next.correct);
       setChoices(next.choices);
-    } else if (assets.length > 0 && currentQuestion >= assets.length) {
-      setIsGameOver(true);
     }
   }, [assets, currentQuestion]);
 
@@ -78,10 +114,69 @@ export const IntFluidController: React.FC = () => {
     if (choice === correctChoice) {
       setScore((prev) => prev + 1);
     }
+    const selectedIndex = choices.indexOf(choice);
+    setAnswers((prev) => [...prev, selectedIndex]);
     setCurrentQuestion((prev) => prev + 1);
   };
 
-  if (isGameOver) {
+  const handleSubmit = async () => {
+    const endTime = new Date().toISOString();
+    const parsedStartTime = new Date(startTime);
+
+    if (!testTemplateId) {
+      showToast({ message: "Test template ID not found.", type: "error" });
+      return;
+    }
+
+    const choicesPayload: CreateTestChoiceRequest[] = questions
+      .slice(0, answers.length)
+      .map((question, idx) => {
+        const selected = question.options[answers[idx]];
+        return {
+          questionId: question.id,
+          selectedOptionId: selected?.id,
+        };
+      });
+
+    const payload: CreateTestSessionRequest = {
+      testTemplateId: testTemplateId,
+      startTime: parsedStartTime.toISOString(),
+      endTime,
+      choices: choicesPayload,
+    };
+
+    try {
+      const response = await createNewTestSession(payload);
+      console.log(
+        JSON.stringify({
+          payload: payload,
+        })
+      );
+
+      console.log(
+        JSON.stringify({
+          message: "Test submitted successfully",
+          data: response.data,
+          level: "info",
+          timestamp: new Date().toISOString(),
+        })
+      );
+      showToast({ message: "Test submitted successfully!", type: "success" });
+      setIsGameOver(true);
+    } catch (error: any) {
+      console.error("Submission failed:", error);
+      showToast({
+        message: error.response?.data?.message || "Submission failed.",
+        type: "error",
+      });
+    } finally {
+      navigate("/");
+    }
+  };
+
+  if (loading) return <LoadingSpinner />;
+
+  if (currentQuestion >= assets.length) {
     return (
       <Paper
         elevation={3}
@@ -93,15 +188,23 @@ export const IntFluidController: React.FC = () => {
           textAlign: "center",
         }}
       >
-        <Typography variant="h4">Game Over</Typography>
+        <Typography variant="h3">Test Complete</Typography>
         <Typography variant="h6">Your Score: {score}</Typography>
+        <Typography variant="body1">Ready to submit your results?</Typography>
+
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          style={{ marginTop: 16 }}
+        >
+          Submit
+        </Button>
       </Paper>
     );
   }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      {/* Stats */}
       <Paper
         elevation={3}
         style={{
@@ -121,7 +224,6 @@ export const IntFluidController: React.FC = () => {
         </Typography>
       </Paper>
 
-      {/* Game */}
       <IntFluid
         gridImage={gridImage}
         choices={choices}

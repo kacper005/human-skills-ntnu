@@ -79,6 +79,7 @@ export const MyTestSessions: React.FC = () => {
     const fetchAllTestSessions = async () => {
       try {
         const response = await getAllTestSessionsFormatted();
+        console.log("Fetched test sessions:", response.data);
         setTestSessions(response.data || []);
       } catch (error) {
         console.error("Error fetching test sessions:", error);

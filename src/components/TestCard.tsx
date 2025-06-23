@@ -10,7 +10,7 @@ interface TestCardProps {
 
 export const TestCard: React.FC<TestCardProps> = ({
   title,
-  description,
+  //description,
   type,
   onClick = () => {},
 }) => {
@@ -39,14 +39,7 @@ export const TestCard: React.FC<TestCardProps> = ({
         >
           {title}
         </Typography>
-        <Typography
-          gutterBottom
-          variant="body1"
-          color="text.secondary"
-          style={{ minHeight: "3em" }}
-        >
-          {description}
-        </Typography>
+
         <Typography variant="body2" color="text.secondary">
           Type: {type}
         </Typography>
