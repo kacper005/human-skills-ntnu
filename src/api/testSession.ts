@@ -44,6 +44,9 @@ export const getAllTestSessionsFormatted = () =>
 export const getTestSessionFormattedById = (id: number) =>
   axiosInstance.get<TestSessionView>(`${BASE_URL}/formatted/${id}`);
 
+export const getTestSessionEvaluation = (request: CreateTestSessionRequest) =>
+  axiosInstance.post<TestSessionView>(`${BASE_URL}/evaluate`, request);
+
 export const createNewTestSession = (request: CreateTestSessionRequest) =>
   axiosInstance.post<number>(`${BASE_URL}/add`, request);
 

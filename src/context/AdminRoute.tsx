@@ -10,7 +10,7 @@ export const AdminRoute = () => {
   }
 
   if (!isLoggedIn || user?.role !== Role.ADMIN) {
-    return <Navigate to="/not-found" />;
+    return <Navigate to="/" />;
   }
 
   return <Outlet />;

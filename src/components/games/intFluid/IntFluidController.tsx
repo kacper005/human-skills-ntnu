@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Grid } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -8,56 +9,53 @@ import { getTestTemplatesByType } from "@api/testTemplate";
 import { TestType } from "@enums/TestType";
 import { TestQuestion } from "@api/testQuestion";
 import { showToast } from "@atoms/Toast";
+import { InfoTooltip } from "@atoms/InfoTooltip";
 import { LoadingSpinner } from "@atoms/LoadingSpinner";
 import {
   createNewTestSession,
   CreateTestSessionRequest,
+  getTestSessionFormattedById,
 } from "@api/testSession";
 import { CreateTestChoiceRequest } from "@api/testChoice";
 
 export const IntFluidController: React.FC = () => {
   const navigate = useNavigate();
+
   const [choices, setChoices] = React.useState<string[]>([]);
   const [gridImage, setGridImage] = React.useState<string>("");
   const [correctChoice, setCorrectChoice] = React.useState<string>("");
   const [assets, setAssets] = React.useState<
     { grid: string; choices: string[]; correct: string }[]
   >([]);
-  const [score, setScore] = React.useState<number>(0);
-  const [currentQuestion, setCurrentQuestion] = React.useState<number>(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] =
+    React.useState<number>(0);
   const [startTime, setStartTime] = React.useState<number>(Date.now());
   const [totalTime, setTotalTime] = React.useState<number>(0);
-  const [_, setIsGameOver] = React.useState<boolean>(false);
   const [testTemplateId, setTestTemplateId] = React.useState<number | null>(
     null
   );
   const [questions, setQuestions] = React.useState<TestQuestion[]>([]);
-  const [answers, setAnswers] = React.useState<number[]>([]);
+  const [selectedAnswers, setSelectedAnswers] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   const TILE_BASE_PATH = "/games/intFluid/tiles/";
 
   React.useEffect(() => {
-    const fetchTestQuestions = async () => {
+    const fetchQuestions = async () => {
       try {
-        const response = await getTestTemplatesByType(
+        const { data: template } = await getTestTemplatesByType(
           TestType.INTELLIGENCE_FLUID
         );
-        const template = response.data;
         setTestTemplateId(template.id);
-
-        if (template.questions && template.questions.length > 0) {
+        if (template.questions?.length) {
           setQuestions(template.questions);
         } else {
-          showToast({
-            message: "No questions found for this test type.",
-            type: "error",
-          });
+          showToast({ message: "No questions found.", type: "error" });
         }
-      } catch (err: any) {
-        console.error(err);
+      } catch (error: any) {
+        console.error(error);
         showToast({
-          message: err.response?.data?.message || "Failed to fetch questions",
+          message: error.response?.data?.message || "Failed to fetch questions",
           type: "error",
         });
       } finally {
@@ -65,23 +63,22 @@ export const IntFluidController: React.FC = () => {
       }
     };
 
-    fetchTestQuestions();
+    fetchQuestions();
   }, []);
 
   React.useEffect(() => {
-    if (questions.length === 0) return;
+    if (!questions.length) return;
 
-    const assets = questions.slice(0, 15).map((q) => {
-      const folderName = q.questionText.split("_")[0];
-      const grid = `${TILE_BASE_PATH}${folderName}/${q.questionText}`;
-
-      const correctOption = q.options[0];
-      const correct = `${TILE_BASE_PATH}${folderName}/${correctOption.optionText}`;
-
+    const preparedAssets = questions.slice(0, 15).map((q) => {
+      const folder = q.questionText.split("_")[0];
+      const grid = `${TILE_BASE_PATH}${folder}/${q.questionText}`;
+      const correctOption = q.options.find((opt) =>
+        opt.optionText.includes("OptionA")
+      );
+      const correct = `${TILE_BASE_PATH}${folder}/${correctOption?.optionText}`;
       const otherChoices = q.options
         .slice(1)
-        .map((opt) => `${TILE_BASE_PATH}${folderName}/${opt.optionText}`);
-
+        .map((opt) => `${TILE_BASE_PATH}${folder}/${opt.optionText}`);
       const allChoices = [correct, ...otherChoices].sort(
         () => Math.random() - 0.5
       );
@@ -89,7 +86,7 @@ export const IntFluidController: React.FC = () => {
       return { grid, correct, choices: allChoices };
     });
 
-    setAssets(assets);
+    setAssets(preparedAssets);
     setStartTime(Date.now());
   }, [questions]);
 
@@ -102,67 +99,60 @@ export const IntFluidController: React.FC = () => {
   }, [startTime]);
 
   React.useEffect(() => {
-    if (assets.length > 0 && currentQuestion < assets.length) {
-      const next = assets[currentQuestion];
-      setGridImage(next.grid);
-      setCorrectChoice(next.correct);
-      setChoices(next.choices);
+    if (assets.length && currentQuestionIndex < assets.length) {
+      const { grid, correct, choices } = assets[currentQuestionIndex];
+      setGridImage(grid);
+      setCorrectChoice(correct);
+      setChoices(choices);
     }
-  }, [assets, currentQuestion]);
+  }, [assets, currentQuestionIndex]);
 
   const handleChoiceClick = (choice: string) => {
-    if (choice === correctChoice) {
-      setScore((prev) => prev + 1);
-    }
-    const selectedIndex = choices.indexOf(choice);
-    setAnswers((prev) => [...prev, selectedIndex]);
-    setCurrentQuestion((prev) => prev + 1);
+    setSelectedAnswers((prev) => [...prev, choice]);
+    setCurrentQuestionIndex((prev) => prev + 1);
   };
 
   const handleSubmit = async () => {
-    const endTime = new Date().toISOString();
-    const parsedStartTime = new Date(startTime);
-
     if (!testTemplateId) {
       showToast({ message: "Test template ID not found.", type: "error" });
       return;
     }
 
+    const parsedStartTime = new Date(startTime).toISOString();
+    const endTime = new Date().toISOString();
+
     const choicesPayload: CreateTestChoiceRequest[] = questions
-      .slice(0, answers.length)
-      .map((question, idx) => {
-        const selected = question.options[answers[idx]];
+      .slice(0, selectedAnswers.length)
+      .map((q, idx) => {
+        const folder = q.questionText.split("_")[0];
+        const selectedImagePath = selectedAnswers[idx];
+        const matchedOption = q.options.find((opt) => {
+          const optionPath = `${TILE_BASE_PATH}${folder}/${opt.optionText}`;
+          return optionPath === selectedImagePath;
+        });
+
         return {
-          questionId: question.id,
-          selectedOptionId: selected?.id,
+          questionId: q.id,
+          selectedOptionId: matchedOption?.id ?? -1,
         };
       });
 
     const payload: CreateTestSessionRequest = {
-      testTemplateId: testTemplateId,
-      startTime: parsedStartTime.toISOString(),
+      testTemplateId,
+      startTime: parsedStartTime,
       endTime,
       choices: choicesPayload,
     };
 
     try {
       const response = await createNewTestSession(payload);
-      console.log(
-        JSON.stringify({
-          payload: payload,
-        })
-      );
 
-      console.log(
-        JSON.stringify({
-          message: "Test submitted successfully",
-          data: response.data,
-          level: "info",
-          timestamp: new Date().toISOString(),
-        })
-      );
+      console.log("Test submitted successfully:", response.data);
+
+      const submittedTest = await getTestSessionFormattedById(response.data);
+      console.log("Submitted Test Details:", submittedTest.data);
+
       showToast({ message: "Test submitted successfully!", type: "success" });
-      setIsGameOver(true);
     } catch (error: any) {
       console.error("Submission failed:", error);
       showToast({
@@ -176,29 +166,35 @@ export const IntFluidController: React.FC = () => {
 
   if (loading) return <LoadingSpinner />;
 
-  if (currentQuestion >= assets.length) {
+  if (currentQuestionIndex >= assets.length) {
     return (
       <Paper
         elevation={3}
-        style={{
-          padding: "32px",
-          borderRadius: "12px",
-          maxWidth: "400px",
+        sx={{
+          padding: 4,
+          borderRadius: 3,
+          maxWidth: 400,
           margin: "100px auto",
           textAlign: "center",
         }}
       >
         <Typography variant="h3">Test Complete</Typography>
-        <Typography variant="h6">Your Score: {score}</Typography>
-        <Typography variant="body1">Ready to submit your results?</Typography>
-
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          style={{ marginTop: 16 }}
-        >
-          Submit
-        </Button>
+        <Typography variant="body1" mt={1}>
+          Ready to submit your results?
+        </Typography>
+        <InfoTooltip title="You can export your test result later, visiting 'My Test Sessions' page." />
+        <Grid container spacing={2} justifyContent="center" mt={2}>
+          <Grid item>
+            <Button variant="outlined" onClick={() => navigate("/")}>
+              Reject
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button variant="contained" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
       </Paper>
     );
   }
@@ -207,10 +203,10 @@ export const IntFluidController: React.FC = () => {
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       <Paper
         elevation={3}
-        style={{
-          padding: "16px",
-          borderRadius: "12px",
-          maxWidth: "400px",
+        sx={{
+          padding: 2,
+          borderRadius: 3,
+          maxWidth: 400,
           margin: "0 auto",
           textAlign: "center",
         }}
@@ -220,7 +216,7 @@ export const IntFluidController: React.FC = () => {
           {("0" + (totalTime % 60)).slice(-2)} minutes
         </Typography>
         <Typography variant="body1">
-          Question: {currentQuestion + 1} / 15
+          Question: {currentQuestionIndex + 1} / 15
         </Typography>
       </Paper>
 

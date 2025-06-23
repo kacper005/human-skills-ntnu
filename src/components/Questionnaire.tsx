@@ -25,6 +25,7 @@ import {
   createNewTestSession,
   CreateTestSessionRequest,
   getTestSessionFormattedById,
+  getTestSessionEvaluation,
 } from "@api/testSession";
 import { getTestTemplatesByType } from "@api/testTemplate";
 import { CreateTestChoiceRequest, TestChoiceView } from "@api/testChoice";
@@ -32,9 +33,10 @@ import { TestType } from "@enums/TestType";
 import { showToast } from "./atoms/Toast";
 import { LoadingSpinner } from "./atoms/LoadingSpinner";
 import { InfoTooltip } from "./atoms/InfoTooltip";
+import { useAuth } from "@hooks/useAuth";
 
 export const Questionnaire: React.FC = () => {
-  // TODO Refactor this component
+  const { isLoggedIn } = useAuth();
   const QUESTIONS_PER_PAGE = 10;
   const navigate = useNavigate();
   const [questions, setQuestions] = React.useState<TestQuestion[]>([]);
@@ -53,20 +55,16 @@ export const Questionnaire: React.FC = () => {
         "questionnaireStartTime",
         new Date().toISOString()
       );
-
       try {
         const response = await getTestTemplatesByType(TestType.BIG_5);
         const template = response.data;
         setTestTemplateId(template.id);
-
-        if (template.questions && template.questions.length > 0) {
-          setQuestions(template.questions);
-        } else {
+        if (template.questions?.length > 0) setQuestions(template.questions);
+        else
           showToast({
             message: "No questions found for this test type.",
             type: "error",
           });
-        }
       } catch (err: any) {
         console.error(err);
         showToast({
@@ -77,7 +75,6 @@ export const Questionnaire: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchTestQuestions();
   }, []);
 
@@ -85,18 +82,13 @@ export const Questionnaire: React.FC = () => {
     event: React.ChangeEvent<HTMLInputElement>,
     questionId: number
   ) => {
-    setAnswers({
-      ...answers,
-      [questionId]: event.target.value,
-    });
+    setAnswers({ ...answers, [questionId]: event.target.value });
   };
 
-  const areCurrentPageQuestionsAnswered = (): boolean => {
-    return paginatedQuestions.every(
-      (question) =>
-        answers[question.id] !== undefined && answers[question.id] !== ""
+  const areCurrentPageQuestionsAnswered = (): boolean =>
+    paginatedQuestions.every(
+      (q) => answers[q.id] !== undefined && answers[q.id] !== ""
     );
-  };
 
   const fetchTestSessionResult = async (sessionId: number) => {
     setLoading(true);
@@ -115,41 +107,49 @@ export const Questionnaire: React.FC = () => {
     const endTime = new Date().toISOString();
 
     try {
-      const startTime = new Date();
       const storedStartTime = sessionStorage.getItem("questionnaireStartTime");
       const parsedStartTime = storedStartTime
         ? new Date(storedStartTime)
-        : startTime;
-
-      const choices: CreateTestChoiceRequest[] = questions.map((question) => {
-        const selectedOptionId = question.options.find(
-          (opt) => opt.agreementLevel.toString() === answers[question.id]
-        )?.id;
-
-        return {
-          questionId: question.id,
-          selectedOptionId: selectedOptionId!,
-        };
-      });
+        : new Date();
 
       if (!testTemplateId) {
         showToast({ message: "Test template ID not found.", type: "error" });
         return;
       }
 
+      const choices: CreateTestChoiceRequest[] = questions.map((q) => {
+        const selectedOption = q.options.find(
+          (opt) => opt.agreementLevel.toString() === answers[q.id]
+        );
+        if (!selectedOption) {
+          throw new Error(`Missing selection for question ${q.id}`);
+        }
+        return {
+          questionId: q.id,
+          selectedOptionId: selectedOption.id,
+        };
+      });
+
       const payload: CreateTestSessionRequest = {
-        testTemplateId: testTemplateId,
+        testTemplateId,
         startTime: parsedStartTime.toISOString(),
         endTime,
         choices,
       };
 
-      const response = await createNewTestSession(payload);
-      const testSessionId = response.data;
+      if (isLoggedIn) {
+        const response = await createNewTestSession(payload);
+        const testSessionId = response.data;
 
-      showToast({ message: "Test submitted successfully!", type: "success" });
+        showToast({ message: "Test submitted successfully!", type: "success" });
+        await fetchTestSessionResult(testSessionId);
+      } else {
+        const response = await getTestSessionEvaluation(payload);
+        const evaluation = response.data;
 
-      fetchTestSessionResult(testSessionId);
+        setResultSummary(evaluation);
+        showToast({ message: "Test completed!", type: "success" });
+      }
 
       setSubmitted(true);
     } catch (error: any) {
@@ -162,46 +162,34 @@ export const Questionnaire: React.FC = () => {
   };
 
   const getRadioColor = (level: number): string => {
-    switch (level) {
-      case 1:
-        return "#e53935"; // red
-      case 2:
-        return "#fb8c00"; // orange
-      case 3:
-        return "#9e9e9e"; // grey
-      case 4:
-        return "#66bb6a"; // light green
-      case 5:
-        return "#388e3c"; // green
-      default:
-        return "#bdbdbd";
-    }
+    const map = {
+      1: "#e53935",
+      2: "#fb8c00",
+      3: "#9e9e9e",
+      4: "#66bb6a",
+      5: "#388e3c",
+    };
+    return map[level as keyof typeof map] || "#bdbdbd";
   };
 
   const getLabelForLevel = (level: number): string => {
-    switch (level) {
-      case 1:
-        return "Strongly Disagree";
-      case 2:
-        return "Disagree";
-      case 3:
-        return "Neutral";
-      case 4:
-        return "Agree";
-      case 5:
-        return "Strongly Agree";
-      default:
-        return "";
-    }
+    return (
+      [
+        "",
+        "Strongly Disagree",
+        "Disagree",
+        "Neutral",
+        "Agree",
+        "Strongly Agree",
+      ][level] || ""
+    );
   };
 
   const handleExportJSON = () => {
     if (!resultSummary) return;
-
     const jsonStr = JSON.stringify(resultSummary, null, 2);
     const blob = new Blob([jsonStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement("a");
     a.href = url;
     a.download = `Test-session-${resultSummary.id}.json`;
@@ -223,10 +211,14 @@ export const Questionnaire: React.FC = () => {
       <Container maxWidth="md">
         <Box display="flex" flexDirection="column" alignItems="center">
           <Paper
-            elevation={0}
-            sx={{ width: "100%", padding: "24px", borderRadius: 5 }}
+            sx={{
+              width: "100%",
+              px: { xs: 2, sm: 4 },
+              py: { xs: 2, sm: 4 },
+              borderRadius: 5,
+            }}
           >
-            <Typography variant="h3" component="h1" gutterBottom align="center">
+            <Typography variant="h3" gutterBottom align="center">
               Thank you for completing the test!
             </Typography>
             <Divider sx={{ my: 2 }} />
@@ -240,9 +232,10 @@ export const Questionnaire: React.FC = () => {
                   📅 Taken: {new Date(resultSummary.endTime).toLocaleString()}
                 </Typography>
                 <Box
-                  display={"flex"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
+                  display="flex"
+                  flexDirection={{ xs: "column", sm: "row" }}
+                  alignItems="center"
+                  justifyContent="center"
                   mt={2}
                   gap={2}
                 >
@@ -252,39 +245,37 @@ export const Questionnaire: React.FC = () => {
                   <Button variant="outlined" onClick={() => navigate("/")}>
                     Back to Home
                   </Button>
-                  <InfoTooltip
-                    title={
-                      "You can export your test result later, visiting 'My Test Sessions' page. "
-                    }
-                  />
+                  <InfoTooltip title="You can export your test result later, visiting 'My Test Sessions' page." />
                 </Box>
 
-                <Table sx={{ mt: 3 }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>
-                        <strong>#</strong>
-                      </TableCell>
-                      <TableCell>
-                        <strong>Question</strong>
-                      </TableCell>
-                      <TableCell>
-                        <strong>Your Answer</strong>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {resultSummary.choices.map(
-                      (choice: TestChoiceView, index: number) => (
-                        <TableRow key={index}>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{choice.question}</TableCell>
-                          <TableCell>{choice.answer}</TableCell>
-                        </TableRow>
-                      )
-                    )}
-                  </TableBody>
-                </Table>
+                <Box sx={{ width: "100%", overflowX: "auto", mt: 3 }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>
+                          <strong>#</strong>
+                        </TableCell>
+                        <TableCell>
+                          <strong>Question</strong>
+                        </TableCell>
+                        <TableCell>
+                          <strong>Your Answer</strong>
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {resultSummary.choices.map(
+                        (choice: TestChoiceView, index: number) => (
+                          <TableRow key={index}>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{choice.question}</TableCell>
+                            <TableCell>{choice.answer}</TableCell>
+                          </TableRow>
+                        )
+                      )}
+                    </TableBody>
+                  </Table>
+                </Box>
               </>
             ) : (
               <LoadingSpinner />
@@ -301,17 +292,19 @@ export const Questionnaire: React.FC = () => {
     <Container maxWidth="md">
       <Box display="flex" flexDirection="column" alignItems="center">
         <Paper
-          elevation={0}
-          sx={{ width: "100%", padding: "16px", borderRadius: 5 }}
+          sx={{
+            width: "100%",
+            px: { xs: 2, sm: 4 },
+            py: { xs: 2, sm: 4 },
+            borderRadius: 5,
+          }}
         >
-          <Typography variant="h3" component="h1" gutterBottom align="center">
+          <Typography variant="h3" gutterBottom align="center">
             Personality Self Assessment
           </Typography>
           <Typography variant="body1" align="center" gutterBottom>
-            Respond to this assessment (test) consisting of {questions.length}{" "}
-            statements, by indicating if you Disagree, Partially Disagree,
-            Neither Disagree nor Agree, Partially Agree or Agree with the
-            statements as given below.
+            Respond to this assessment consisting of {questions.length}{" "}
+            statements by indicating your level of agreement.
           </Typography>
 
           <Box
@@ -324,16 +317,13 @@ export const Questionnaire: React.FC = () => {
             <Typography variant="body2" sx={{ mr: 2 }}>
               Disagree
             </Typography>
-
             <RadioGroup row>
               {[1, 2, 3, 4, 5].map((level) => (
                 <Tooltip key={level} title={getLabelForLevel(level)} arrow>
                   <Radio
                     disabled
                     sx={{
-                      "&.Mui-disabled": {
-                        color: getRadioColor(level),
-                      },
+                      "&.Mui-disabled": { color: getRadioColor(level) },
                       "&.MuiRadio-root.Mui-disabled.Mui-checked": {
                         color: getRadioColor(level),
                       },
@@ -343,45 +333,23 @@ export const Questionnaire: React.FC = () => {
                 </Tooltip>
               ))}
             </RadioGroup>
-
             <Typography variant="body2" sx={{ ml: 2 }}>
               Agree
             </Typography>
           </Box>
 
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            px={4}
-            py={2}
-          >
-            <Typography
-              variant="subtitle1"
-              sx={{ flex: 1, fontWeight: "bold" }}
-            >
-              Statement
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{ textAlign: "center", fontWeight: "bold" }}
-            >
-              Agreement Level
-            </Typography>
-          </Box>
-          <Divider />
-
           {paginatedQuestions.map((question) => (
-            <FormControl component="fieldset" key={question.id} fullWidth>
+            <FormControl key={question.id} fullWidth>
               <Box
                 display="flex"
+                flexDirection={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "flex-start", sm: "center" }}
                 margin={1}
+                gap={1}
               >
                 <FormLabel
-                  component="legend"
-                  sx={{ flexGrow: 1, textAlign: "left", marginLeft: "32px" }}
+                  sx={{ flexGrow: 1, ml: { sm: 4 }, textAlign: "left" }}
                 >
                   {question.id}. {question.questionText}
                 </FormLabel>
@@ -390,7 +358,10 @@ export const Questionnaire: React.FC = () => {
                   row
                   value={answers[question.id] || ""}
                   onChange={(event) => handleChange(event, question.id)}
-                  sx={{ flexGrow: 0, gap: 0.0 }}
+                  sx={{
+                    flexWrap: "wrap",
+                    justifyContent: { xs: "flex-start", sm: "center" },
+                  }}
                 >
                   {question.options.map((option) => (
                     <FormControlLabel
@@ -399,10 +370,8 @@ export const Questionnaire: React.FC = () => {
                       control={
                         <Radio
                           sx={{
-                            transition: "transform 0.2s ease-in-out",
-                            "&:hover": {
-                              transform: "scale(1.2)",
-                            },
+                            transition: "transform 0.2s",
+                            "&:hover": { transform: "scale(1.2)" },
                             color: getRadioColor(option.agreementLevel),
                             "&.Mui-checked": {
                               color: getRadioColor(option.agreementLevel),
@@ -424,16 +393,17 @@ export const Questionnaire: React.FC = () => {
             justifyContent="center"
             alignItems="center"
             mt={4}
+            flexWrap="wrap"
+            gap={2}
           >
             <Button
               variant="outlined"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              sx={{ mx: 1 }}
             >
               Previous
             </Button>
-            <Typography variant="body1" mx={2}>
+            <Typography variant="body1">
               Page {currentPage} of {totalPages}
             </Typography>
             <Button
@@ -442,7 +412,6 @@ export const Questionnaire: React.FC = () => {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages}
-              sx={{ mx: 1 }}
             >
               Next
             </Button>
@@ -453,7 +422,7 @@ export const Questionnaire: React.FC = () => {
               display="flex"
               justifyContent="center"
               alignItems="center"
-              mt={2}
+              mt={3}
             >
               <Tooltip
                 title={
