@@ -1,6 +1,7 @@
 import { axiosInstance } from "./axiosInstance";
+import { TestSessionView } from "./testSession";
 
-const BASE_URL = "/tudent-teacher-relation";
+const BASE_URL = "/student-teacher-relation";
 
 export interface StudentTeacherRelation {
   id: number;
@@ -9,8 +10,8 @@ export interface StudentTeacherRelation {
   testSessionId: number;
 }
 
-export const getStudentTeacherRelations = () =>
-  axiosInstance.get<StudentTeacherRelation[]>(`${BASE_URL}`);
+export const getSharedTestSessions = () =>
+  axiosInstance.get<TestSessionView[]>(`${BASE_URL}/testSessions`);
 
 export const addStudentTeacherRelation = () =>
   axiosInstance.post<StudentTeacherRelation>(`${BASE_URL}/add`, {});

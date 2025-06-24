@@ -71,7 +71,7 @@ export const GameCardGrid: React.FC = () => {
         color="secondary"
         paddingBottom="24px"
       >
-        Cognitive Games
+        Cognitive Games (Comming Soon)
       </Typography>
       <Grid
         container

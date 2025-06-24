@@ -8,6 +8,7 @@ import Toolbar from "@mui/material/Toolbar";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import { useAuth } from "@hooks/useAuth";
 
 import { Avatar, Divider, ListItemIcon, Typography } from "@mui/material";
@@ -104,7 +105,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             component={Link}
             to="/home"
           >
-            <img src="/HumanSkillsLogo.png" alt="Logo" style={{ height: 64 }} />
+            <img src="/HumanSkillsLogo.svg" alt="Logo" style={{ height: 60 }} />
           </Typography>
 
           <Box sx={{ flexGrow: 1 }} />
@@ -183,6 +184,22 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     My Test Sessions
                   </MenuItem>
 
+                  <Divider />
+
+                  {user?.role === "TEACHER" && (
+                    <>
+                      <MenuItem
+                        onClick={() => navigate("/shared-test-sessions")}
+                      >
+                        <ListItemIcon>
+                          <FolderSharedIcon fontSize="small" />
+                        </ListItemIcon>
+                        Shared Test Sessions
+                      </MenuItem>
+                      <Divider />
+                    </>
+                  )}
+
                   {/* Dark Mode Toggle
                   <MenuItem onClick={handleDarkMode}>
                     <ListItemIcon>
@@ -194,8 +211,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     </ListItemIcon>
                     {darkMode ? "Light Mode" : "Dark Mode"}
                   </MenuItem> */}
-
-                  <Divider />
 
                   {/*  Logout Button */}
                   <MenuItem onClick={handleLogout}>

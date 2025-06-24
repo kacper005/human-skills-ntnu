@@ -19,6 +19,7 @@ export interface TestSession {
 
 export interface TestSessionView {
   id: number;
+  userId: number;
   userEmail: string;
   userRole: Role;
   testName: string;

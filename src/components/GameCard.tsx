@@ -84,6 +84,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             },
           }}
           onClick={handleGameStart}
+          disabled
         >
           Play Game
         </Button>

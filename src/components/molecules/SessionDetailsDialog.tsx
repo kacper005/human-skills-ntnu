@@ -21,7 +21,7 @@ interface SessionDetailsDialogProps {
   dialogOpen: boolean;
   onClose: () => void;
   onExport: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   selectedRow: TestSessionView | null;
   loading: boolean;
 }
@@ -103,7 +103,13 @@ export const SessionDetailsDialog: React.FC<SessionDetailsDialogProps> = ({
                   {selectedRow.choices.map((choice, index) => (
                     <TableRow key={index}>
                       <TableCell>{choice.question}</TableCell>
-                      <TableCell>{choice.answer}</TableCell>
+                      <TableCell>
+                        {choice.answer.includes("Incorrect")
+                          ? `${choice.answer} ❌`
+                          : choice.answer.includes("Correct")
+                          ? `${choice.answer} ✅`
+                          : choice.answer}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -117,9 +123,11 @@ export const SessionDetailsDialog: React.FC<SessionDetailsDialogProps> = ({
         <Button onClick={onClose} variant="outlined">
           Close
         </Button>
-        <Button onClick={onDelete} variant="contained" color="error">
-          Delete
-        </Button>
+        {onDelete && (
+          <Button onClick={onDelete} variant="contained" color="error">
+            Delete
+          </Button>
+        )}
         <Button onClick={onExport} variant="contained">
           Export JSON
         </Button>

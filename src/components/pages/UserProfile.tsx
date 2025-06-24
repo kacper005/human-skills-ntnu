@@ -301,7 +301,7 @@ export const UserProfile: React.FC = () => {
                         {studyPrograms.map((program) => (
                           <MenuItem key={program.id} value={program.id}>
                             {program.name}{" "}
-                            {getCampusDisplayName(program.campus)}
+                            {`(${getCampusDisplayName(program.campus)})`}
                           </MenuItem>
                         ))}
                       </TextField>
