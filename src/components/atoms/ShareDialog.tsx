@@ -1,119 +1,265 @@
 import React from "react";
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogContentText,
-    DialogActions,
-    Button,
-    MenuItem, Select, InputLabel, FormControl, Grid2, SelectChangeEvent, Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  Box,
+  Grid,
+  SelectChangeEvent,
 } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-import {getTeachers, Teacher} from "@api/userApi.ts";
-import {showToast} from "@atoms/Toast.tsx";
-import {LoadingSpinner} from "@atoms/LoadingSpinner.tsx";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-type ShareDialogueProps = {
-    open: boolean;
-    title: string;
-    onClose: () => void;
-    onAddTeacher?: () => void;
-    onRemoveTeacher?: () => void;
-}
+import { getAllTeachers, Teacher } from "@api/userApi.ts";
+import {
+  addStudentTeacherRelation,
+  deleteStudentTeacherRelation,
+  getStudentTeacherRelationsBySessionId,
+} from "@api/studentTeacher.ts";
+import { showToast } from "@atoms/Toast.tsx";
+import { LoadingSpinner } from "@atoms/LoadingSpinner.tsx";
 
-export const ShareDialog: React.FC<ShareDialogueProps> = ({
-    open,
-    title,
-    onClose,
-                               }) => {
-    const [teachers, setTeachers] = React.useState<Teacher[]>([]);
-    const [selectedTeacher, setSelectedTeacher] = React.useState<Teacher | null>(null);
-    const [loading, setLoading] = React.useState<boolean>(true);
+type ShareDialogProps = {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  testSessionId: number;
+};
 
-    React.useEffect(() => {
-        const fetchAllTeachers = async () => {
-            try {
-                const response = await getTeachers();
-                console.log("Teachers fetched successfully:", response.data);
-                setTeachers(response.data);
-            } catch (error) {
-                console.error("Error fetching teachers:", error);
-                showToast({ message: "Could not load teachers", type: "error" });
-            } finally {
-                setLoading(false);
-            }
-        }
+export const ShareDialog: React.FC<ShareDialogProps> = ({
+  open,
+  title,
+  onClose,
+  testSessionId,
+}) => {
+  const [_, setTeachers] = React.useState<Teacher[]>([]);
+  const [sharedTeachers, setSharedTeachers] = React.useState<Teacher[]>([]);
+  const [availableTeachers, setAvailableTeachers] = React.useState<Teacher[]>(
+    []
+  );
+  const [selectedTeacherId, setSelectedTeacherId] = React.useState<string>("");
+  const [loading, setLoading] = React.useState<boolean>(false);
 
-        fetchAllTeachers();
-    }, []);
+  const loadTeachersAndRelations = async () => {
+    try {
+      setLoading(true);
 
-    const handleChange = (event: SelectChangeEvent<number>) => {
-        const selectedTeacherId = Number(event.target.value);
-        console.log(selectedTeacherId);
-        const selectedTeacher = teachers.find((teacher) => teacher.id === selectedTeacherId);
-        console.log(selectedTeacher);
-        setSelectedTeacher(selectedTeacher);
-    };
+      const [allTeachersRes, relationsRes] = await Promise.all([
+        getAllTeachers(),
+        getStudentTeacherRelationsBySessionId(testSessionId),
+      ]);
 
-    if (loading) {
-        return <Box></Box>;
+      const allTeachers: Teacher[] = allTeachersRes.data;
+      const relations = relationsRes.data;
+
+      const shared = allTeachers.filter((teacher: Teacher) =>
+        relations.some((rel) => rel.teacherEmail === teacher.teacherEmail)
+      );
+
+      const available = allTeachers.filter(
+        (teacher: Teacher) =>
+          !shared.some((st) => st.teacherEmail === teacher.teacherEmail)
+      );
+
+      setTeachers(allTeachers);
+      setSharedTeachers(shared);
+      setAvailableTeachers(available);
+    } catch (error) {
+      console.error("Error loading data", error);
+      showToast({ message: "Failed to load teachers", type: "error" });
+    } finally {
+      setLoading(false);
     }
+  };
 
+  React.useEffect(() => {
+    if (open && testSessionId) {
+      loadTeachersAndRelations();
+    }
+  }, [open, testSessionId]);
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setSelectedTeacherId(event.target.value);
+  };
+
+  const handleAddTeacher = async () => {
+    const teacherToAdd = availableTeachers.find(
+      (t) => t.teacherId.toString() === selectedTeacherId
+    );
+    if (!teacherToAdd) return;
+
+    try {
+      await addStudentTeacherRelation({
+        teacherId: teacherToAdd.teacherId,
+        testSessionId,
+      });
+
+      setSharedTeachers((prev) => [...prev, teacherToAdd]);
+      setAvailableTeachers((prev) =>
+        prev.filter((t) => t.teacherId !== teacherToAdd.teacherId)
+      );
+      setSelectedTeacherId("");
+      showToast({ message: "Teacher added successfully", type: "success" });
+    } catch (error) {
+      console.error("Error adding teacher", error);
+      showToast({ message: "Failed to share session", type: "error" });
+    }
+  };
+
+  const handleRemoveTeacher = async (teacherId: number) => {
+    try {
+      const relations = await getStudentTeacherRelationsBySessionId(
+        testSessionId
+      );
+
+      console.log("Relations to check:", relations.data);
+      const teacher = sharedTeachers.find((t) => t.teacherId === teacherId);
+      if (!teacher) {
+        showToast({ message: "Teacher not found", type: "error" });
+        return;
+      }
+
+      const relation = relations.data.find(
+        (r) => r.teacherEmail === teacher.teacherEmail
+      );
+
+      console.log("Relation to remove:", relation);
+
+      if (!relation) {
+        showToast({ message: "Relation not found", type: "error" });
+        return;
+      }
+
+      await deleteStudentTeacherRelation(relation.relationId);
+
+      const removed = sharedTeachers.find((t) => t.teacherId === teacherId);
+      if (removed) {
+        setAvailableTeachers((prev) => [...prev, removed]);
+      }
+
+      setSharedTeachers((prev) =>
+        prev.filter((t) => t.teacherId !== teacherId)
+      );
+
+      showToast({ message: "Teacher removed successfully", type: "success" });
+    } catch (error) {
+      console.error("Error removing teacher", error);
+      showToast({ message: "Failed to remove teacher", type: "error" });
+    }
+  };
+
+  if (loading) {
     return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>{title}</DialogTitle>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="200px"
+      >
+        <LoadingSpinner />
+      </Box>
+    );
+  }
 
-            <DialogContent>
-                <Grid2 container spacing={2} alignItems={"center"} margin={"sm"} justifyContent="space-between">
-                    <Grid2 size={9} item>
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label" key={selectedTeacher?.id}>
-                                {selectedTeacher ? selectedTeacher.teacherName : "Select a Teacher"}
-                            </InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={selectedTeacher?.id ?? ""}
-                                label="Teachers"
-                                onChange={handleChange}
-                            >
-                                {teachers.map((teacher) => (
-                                    <MenuItem key={teacher.id + ""} value={teacher.id}>
-                                        {teacher.teacherName} ({teacher.teacherEmail})
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid2>
-                    <Grid2 item>
-                        <Button variant="contained" sx={{ width: 100, height: 55}}>
-                            Add
-                        </Button>
-                    </Grid2>
-                </Grid2>
+  return (
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{title}</DialogTitle>
 
-                <DialogContentText marginTop={5}>
-                    Teachers can view this test session:
+      <DialogContent>
+        {/* Select + Add Button */}
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={9}>
+            <FormControl fullWidth sx={{ mt: 1 }}>
+              <InputLabel id="select-teacher-label">
+                Select a Teacher
+              </InputLabel>
+              <Select
+                labelId="select-teacher-label"
+                value={selectedTeacherId}
+                onChange={handleChange}
+                label="Select a Teacher"
+              >
+                {availableTeachers.length === 0 ? (
+                  <MenuItem disabled>No teachers available</MenuItem>
+                ) : (
+                  availableTeachers.map((teacher) => (
+                    <MenuItem
+                      key={teacher.teacherId}
+                      value={teacher.teacherId.toString()}
+                    >
+                      {teacher.teacherName} ({teacher.teacherEmail})
+                    </MenuItem>
+                  ))
+                )}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <Button
+              variant="contained"
+              sx={{ width: "100%", height: "56px", mt: 1 }}
+              onClick={handleAddTeacher}
+              disabled={!selectedTeacherId}
+            >
+              Add
+            </Button>
+          </Grid>
+        </Grid>
+
+        {/* Shared Teachers List */}
+        <DialogContentText sx={{ mt: 5 }}>
+          Teachers who can view this test session:
+        </DialogContentText>
+
+        <Grid container spacing={2} direction="column" sx={{ mt: 2 }}>
+          {sharedTeachers.map((teacher) => (
+            <Grid
+              key={teacher.teacherId}
+              container
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: 2,
+                p: 2,
+                mb: 1,
+              }}
+            >
+              <Box>
+                <DialogContentText fontWeight="bold" sx={{ mb: 0.5 }}>
+                  {teacher.teacherName}
                 </DialogContentText>
+                <DialogContentText>{teacher.teacherEmail}</DialogContentText>
+              </Box>
+              <Button
+                variant="outlined"
+                color="error"
+                sx={{
+                  minWidth: "40px",
+                  minHeight: "40px",
+                  p: 1,
+                  ml: 2,
+                }}
+                onClick={() => handleRemoveTeacher(teacher.teacherId)}
+              >
+                <DeleteIcon fontSize="small" />
+              </Button>
+            </Grid>
+          ))}
+        </Grid>
+      </DialogContent>
 
-                <Grid2 container spacing={2} flexDirection="column" sx={{ marginTop: 2 }} justifyContent="center">
-                    <Grid2 item display="flex" alignItems="center" gap={2} justifyContent="space-between">
-                        <DialogContentText fontWeight="bold">TeacherName</DialogContentText>
-                        <DialogContentText>Teacher@Teacher.com</DialogContentText>
-                        <Button variant="outlined" color="error">
-                            <DeleteIcon></DeleteIcon>
-                        </Button>
-                    </Grid2>
-                </Grid2>
-
-
-            </DialogContent>
-
-            <DialogActions>
-                <Button onClick={onClose} variant="outlined">Close</Button>
-            </DialogActions>
-        </Dialog>
-
-
-    )
-}
+      <DialogActions>
+        <Button onClick={onClose} variant="outlined">
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};

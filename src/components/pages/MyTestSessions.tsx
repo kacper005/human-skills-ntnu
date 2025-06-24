@@ -111,9 +111,9 @@ export const MyTestSessions: React.FC = () => {
     }
   };
 
-  const handleShare = async ()  => {
+  const handleShare = async () => {
     setShareDialogOpen(true);
-  }
+  };
 
   const handleRequestDelete = () => {
     setConfirmDialogOpen(true);
@@ -152,11 +152,14 @@ export const MyTestSessions: React.FC = () => {
         onClose={() => setConfirmDialogOpen(false)}
         onConfirm={confirmAndDelete}
       />
-      <ShareDialog
+      {selectedSession && (
+        <ShareDialog
           title="Share Test Session"
           open={shareDialogOpen}
           onClose={() => setShareDialogOpen(false)}
-      />
+          testSessionId={selectedSession.id}
+        />
+      )}
     </div>
   );
 };

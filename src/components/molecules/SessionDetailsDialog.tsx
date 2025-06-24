@@ -21,6 +21,7 @@ interface SessionDetailsDialogProps {
   dialogOpen: boolean;
   onClose: () => void;
   onExport: () => void;
+  onShare?: () => void;
   onDelete?: () => void;
   selectedRow: TestSessionView | null;
   loading: boolean;
@@ -30,6 +31,7 @@ export const SessionDetailsDialog: React.FC<SessionDetailsDialogProps> = ({
   dialogOpen,
   onClose,
   onExport,
+  onShare,
   onDelete,
   selectedRow,
   loading,
@@ -131,6 +133,11 @@ export const SessionDetailsDialog: React.FC<SessionDetailsDialogProps> = ({
         <Button onClick={onExport} variant="contained">
           Export JSON
         </Button>
+        {onShare && (
+          <Button onClick={onShare} variant="contained" color="primary">
+            Share
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

@@ -1,11 +1,14 @@
 import React from "react";
 import { Typography } from "@mui/material";
-import { getTestSessionFormattedById, TestSessionView } from "@api/testSession";
+import { TestSessionView } from "@api/testSession";
 import { showToast } from "@atoms/Toast";
 import { LoadingSpinner } from "@atoms/LoadingSpinner";
 import { SessionDetailsDialog } from "@molecules/SessionDetailsDialog";
 import { GenericTable } from "@organisms/GenericTable";
-import { getSharedTestSessions } from "@api/studentTeacher";
+import {
+  getSharedTestSessions,
+  getSharedTestSessionsById,
+} from "@api/studentTeacher";
 
 const columns: {
   id: keyof TestSessionView;
@@ -59,7 +62,7 @@ export const SharedSessions: React.FC = () => {
     setDialogOpen(true);
     setSessionDialogLoading(true);
     try {
-      const response = await getTestSessionFormattedById(row.id);
+      const response = await getSharedTestSessionsById(row.id);
       setSelectedSession(response.data);
     } catch (error) {
       console.error("Failed to fetch session details", error);
