@@ -11,7 +11,7 @@ import { ConfirmDialog } from "@atoms/ConfirmDialog";
 import { LoadingSpinner } from "@atoms/LoadingSpinner";
 import { SessionDetailsDialog } from "@molecules/SessionDetailsDialog";
 import { GenericTable } from "@organisms/GenericTable";
-
+import { ShareDialog } from "@atoms/ShareDialog";
 const columns: {
   id: keyof TestSessionView;
   label: string;
@@ -38,6 +38,7 @@ export const MyTestSessions: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const [testSessions, setTestSessions] = React.useState<TestSessionView[]>([]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
   const [selectedSession, setSelectedSession] =
     React.useState<TestSessionView | null>(null);
   const [sessionDialogLoading, setSessionDialogLoading] = React.useState(false);
@@ -110,6 +111,10 @@ export const MyTestSessions: React.FC = () => {
     }
   };
 
+  const handleShare = async ()  => {
+    setShareDialogOpen(true);
+  }
+
   const handleRequestDelete = () => {
     setConfirmDialogOpen(true);
   };
@@ -132,6 +137,7 @@ export const MyTestSessions: React.FC = () => {
         onClose={handleCloseDialog}
         onExport={handleExportJSON}
         onDelete={handleRequestDelete}
+        onShare={handleShare}
         selectedRow={selectedSession}
         loading={sessionDialogLoading}
       />
@@ -145,6 +151,11 @@ export const MyTestSessions: React.FC = () => {
         confirmationPrompt='Type "Delete" to confirm.'
         onClose={() => setConfirmDialogOpen(false)}
         onConfirm={confirmAndDelete}
+      />
+      <ShareDialog
+          title="Share Test Session"
+          open={shareDialogOpen}
+          onClose={() => setShareDialogOpen(false)}
       />
     </div>
   );

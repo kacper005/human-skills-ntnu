@@ -2,6 +2,7 @@ import { axiosInstance } from "./axiosInstance";
 import { Role } from "@enums/Role";
 import { Gender } from "@enums/Gender";
 import { AuthProvider } from "@enums/AuthProvider";
+import {TeacherRelation} from "@api/studentTeacher.ts";
 
 const BASE_URL = "/user";
 
@@ -39,6 +40,12 @@ export interface UpdateUserDto {
   role: Role;
 }
 
+export interface Teacher {
+    id: number;
+    email: string;
+    name: string;
+}
+
 export const getUserMe = () => axiosInstance.get<User>(`${BASE_URL}/get-me`);
 
 export const updateUserMe = (data: UpdateUserMeDto) =>
@@ -56,3 +63,6 @@ export const createUser = (data: CreateUserDto) =>
 
 export const updateUserRole = (id: number, role: Role) =>
   axiosInstance.put<string>(`${BASE_URL}/update-role/${id}`, role);
+
+export const getTeachers = () =>
+  axiosInstance.get<Teacher[]>(`${BASE_URL}/teachers`);
