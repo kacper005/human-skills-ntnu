@@ -10,10 +10,10 @@ import {
   Typography,
 } from "@mui/material";
 import { getUsers, updateUserRole, UpdateUserDto, User } from "@api/userApi";
-import { getRoleDisplayName, Role } from "@enums/Role";
 import { showToast } from "@atoms/Toast";
-import { GenericTable } from "@organisms/GenericTable";
 import { LoadingSpinner } from "@atoms/LoadingSpinner";
+import { GenericTable } from "@organisms/GenericTable";
+import { getRoleDisplayName, Role } from "@enums/Role";
 
 const columns: {
   id: keyof User;

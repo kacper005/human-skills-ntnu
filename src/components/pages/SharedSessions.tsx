@@ -1,14 +1,14 @@
 import React from "react";
 import { Typography } from "@mui/material";
+import {
+  getSharedTestSessions,
+  getSharedTestSessionsById,
+} from "@api/studentTeacher";
 import { TestSessionView } from "@api/testSession";
 import { showToast } from "@atoms/Toast";
 import { LoadingSpinner } from "@atoms/LoadingSpinner";
 import { SessionDetailsDialog } from "@molecules/SessionDetailsDialog";
 import { GenericTable } from "@organisms/GenericTable";
-import {
-  getSharedTestSessions,
-  getSharedTestSessionsById,
-} from "@api/studentTeacher";
 
 const columns: {
   id: keyof TestSessionView;

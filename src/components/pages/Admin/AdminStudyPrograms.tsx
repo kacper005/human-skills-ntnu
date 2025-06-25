@@ -1,12 +1,5 @@
 import React from "react";
 import {
-  addStudyProgram,
-  CreateStudyProgramDto,
-  getStudyPrograms,
-  StudyProgram,
-} from "@api/studyProgramApi";
-import { Column, GenericTable } from "../../organisms/GenericTable";
-import {
   Button,
   Dialog,
   DialogActions,
@@ -15,11 +8,18 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
+import {
+  addStudyProgram,
+  CreateStudyProgramDto,
+  getStudyPrograms,
+  StudyProgram,
+} from "@api/studyProgramApi";
 import { updateStudyProgram, deleteStudyProgram } from "@api/studyProgramApi";
 import { showToast } from "@atoms/Toast";
-import { getStudyLevelDisplayName, StudyLevel } from "@enums/StudyLevel";
-import { Campus, getCampusDisplayName } from "@enums/Campus";
 import { LoadingSpinner } from "@atoms/LoadingSpinner";
+import { Column, GenericTable } from "@organisms/GenericTable";
+import { Campus, getCampusDisplayName } from "@enums/Campus";
+import { getStudyLevelDisplayName, StudyLevel } from "@enums/StudyLevel";
 
 const columns: Column<StudyProgram>[] = [
   { id: "name", label: "Program Name", minWidth: 150 },

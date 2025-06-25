@@ -15,7 +15,6 @@ const ImageWithFallback: React.FC<{
   style?: React.CSSProperties;
 }> = ({ basePath, alt, style }) => (
   <picture>
-    <source srcSet={`${basePath}.png`} type="image/gif" />
     <source srcSet={`${basePath}.png`} type="image/png" />
     <img src={`${basePath}.png`} alt={alt} style={style} />
   </picture>

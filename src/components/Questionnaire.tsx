@@ -19,21 +19,21 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-
 import { TestQuestion } from "@api/testQuestion";
 import {
   createNewTestSession,
   CreateTestSessionRequest,
   getTestSessionFormattedById,
   getTestSessionEvaluation,
+  TestSessionView,
 } from "@api/testSession";
 import { getTestTemplatesByType } from "@api/testTemplate";
 import { CreateTestChoiceRequest, TestChoiceView } from "@api/testChoice";
-import { TestType } from "@enums/TestType";
-import { showToast } from "./atoms/Toast";
-import { LoadingSpinner } from "./atoms/LoadingSpinner";
-import { InfoTooltip } from "./atoms/InfoTooltip";
 import { useAuth } from "@hooks/useAuth";
+import { showToast } from "@atoms/Toast";
+import { InfoTooltip } from "@atoms/InfoTooltip";
+import { LoadingSpinner } from "@atoms/LoadingSpinner";
+import { TestType } from "@enums/TestType";
 
 export const Questionnaire: React.FC = () => {
   const { isLoggedIn } = useAuth();
@@ -47,7 +47,8 @@ export const Questionnaire: React.FC = () => {
   const [testTemplateId, setTestTemplateId] = React.useState<number | null>(
     null
   );
-  const [resultSummary, setResultSummary] = React.useState<any | null>(null);
+  const [resultSummary, setResultSummary] =
+    React.useState<TestSessionView | null>(null);
 
   React.useEffect(() => {
     const fetchTestQuestions = async () => {

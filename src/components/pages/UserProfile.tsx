@@ -8,7 +8,6 @@ import {
   Grid,
   MenuItem,
 } from "@mui/material";
-import { useAuth } from "@hooks/useAuth";
 import {
   getStudentProfile,
   createStudentProfile,
@@ -17,12 +16,13 @@ import {
 } from "@api/studentProfileApi";
 import { getStudyPrograms, StudyProgram } from "@api/studyProgramApi";
 import { UpdateUserMeDto, deleteUserMe, updateUserMe } from "@api/userApi";
-import { getRoleDisplayName } from "@enums/Role";
-import { Gender, getGenderDisplayName } from "@enums/Gender";
+import { useAuth } from "@hooks/useAuth";
 import { showToast } from "@atoms/Toast";
 import { ConfirmDialog } from "@atoms/ConfirmDialog";
-import { LoadingSpinner } from "../atoms/LoadingSpinner";
+import { LoadingSpinner } from "@atoms/LoadingSpinner";
+import { getRoleDisplayName } from "@enums/Role";
 import { getCampusDisplayName } from "@enums/Campus";
+import { Gender, getGenderDisplayName } from "@enums/Gender";
 
 export const UserProfile: React.FC = () => {
   const { user, loading, logout } = useAuth();

@@ -1,15 +1,5 @@
 import React from "react";
 import {
-  getAllTestTemplates,
-  TestTemplate,
-  updateTestTemplateDescription,
-} from "@api/testTemplate";
-import { LoadingSpinner } from "@atoms/LoadingSpinner";
-import { showToast } from "@atoms/Toast";
-import { GenericTable } from "@organisms/GenericTable";
-import { getTestOptionTypeDisplayName } from "@enums/TestOptionType";
-import { getTestTypeDisplayName } from "@enums/TestType";
-import {
   Button,
   Dialog,
   DialogActions,
@@ -18,6 +8,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import {
+  getAllTestTemplates,
+  TestTemplate,
+  updateTestTemplateDescription,
+} from "@api/testTemplate";
+import { showToast } from "@atoms/Toast";
+import { LoadingSpinner } from "@atoms/LoadingSpinner";
+import { GenericTable } from "@organisms/GenericTable";
+import { getTestTypeDisplayName } from "@enums/TestType";
+import { getTestOptionTypeDisplayName } from "@enums/TestOptionType";
 
 const columns: {
   id: keyof TestTemplate;

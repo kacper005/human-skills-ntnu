@@ -13,8 +13,8 @@ import { createUser, CreateUserDto } from "@api/userApi";
 import { useAuth } from "@hooks/useAuth";
 import { Role } from "@enums/Role";
 import { Gender } from "@enums/Gender";
-import { AuthProvider } from "@enums/AuthProvider";
 import { showToast } from "@atoms/Toast";
+import { AuthProvider } from "@enums/AuthProvider";
 
 export const SignUp: React.FC = () => {
   const { login } = useAuth();

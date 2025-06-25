@@ -7,11 +7,12 @@ import {
   TestSessionView,
 } from "@api/testSession";
 import { showToast } from "@atoms/Toast";
+import { ShareDialog } from "@atoms/ShareDialog";
 import { ConfirmDialog } from "@atoms/ConfirmDialog";
 import { LoadingSpinner } from "@atoms/LoadingSpinner";
 import { SessionDetailsDialog } from "@molecules/SessionDetailsDialog";
 import { GenericTable } from "@organisms/GenericTable";
-import { ShareDialog } from "@atoms/ShareDialog";
+
 const columns: {
   id: keyof TestSessionView;
   label: string;

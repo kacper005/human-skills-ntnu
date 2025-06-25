@@ -1,11 +1,12 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
+import { getAllTestTemplates, TestTemplate } from "@api/testTemplate";
+import { useAuth } from "@hooks/useAuth";
+import { showToast } from "@atoms/Toast";
+import { WelcomeDialog } from "@atoms/WelcomeDialog";
+import { LoadingSpinner } from "@atoms/LoadingSpinner";
 import { TestCardGrid } from "../TestCardGrid";
 import { GameCardGrid } from "../GameCardGrid";
-import { useAuth } from "@hooks/useAuth";
-import { getAllTestTemplates, TestTemplate } from "@api/testTemplate";
-import { showToast } from "@atoms/Toast";
-import { LoadingSpinner } from "@atoms/LoadingSpinner";
 
 export const Home: React.FC = () => {
   const theme = useTheme();
@@ -49,6 +50,7 @@ export const Home: React.FC = () => {
           <GameCardGrid />
         </>
       )}
+      <WelcomeDialog />
     </Box>
   );
 };

@@ -12,8 +12,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useAuth } from "@hooks/useAuth";
-import { AuthProvider as AuthProviderType } from "@enums/AuthProvider";
 import { showToast } from "@atoms/Toast";
+import { AuthProvider as AuthProviderType } from "@enums/AuthProvider";
 
 interface LoginProps {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 import React from "react";
-import { Box, Typography, Button, Dialog, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Box, Typography, Button, Dialog, useTheme } from "@mui/material";
 
 interface GameInfoProps {
   gameInfo: Array<string>;

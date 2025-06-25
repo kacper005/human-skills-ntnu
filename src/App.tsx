@@ -5,13 +5,13 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ToastContainer } from "react-toastify";
 import { useAuth } from "@hooks/useAuth";
+import { ScrollToTop } from "@hooks/ScrollToTop";
 import { ProtectedRoute } from "@context/ProtectedRoute";
 import { RoleProtectedRoute } from "@context/RoleProtectedRoute";
-import { ScrollToTop } from "@hooks/ScrollToTop";
 import { Home } from "@pages/Home";
 import { SignIn } from "@pages/SignIn";
 import { SignUp } from "@pages/SignUp";

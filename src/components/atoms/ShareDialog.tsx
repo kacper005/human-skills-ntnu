@@ -15,13 +15,12 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-import { getAllTeachers, Teacher } from "@api/userApi.ts";
 import {
   addStudentTeacherRelation,
   deleteStudentTeacherRelation,
   getStudentTeacherRelationsBySessionId,
 } from "@api/studentTeacher.ts";
+import { getAllTeachers, Teacher } from "@api/userApi.ts";
 import { showToast } from "@atoms/Toast.tsx";
 import { LoadingSpinner } from "@atoms/LoadingSpinner.tsx";
 

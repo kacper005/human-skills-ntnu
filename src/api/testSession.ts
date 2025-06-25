@@ -27,6 +27,7 @@ export interface TestSessionView {
   startTime: string;
   endTime: string;
   choices: TestChoiceView[];
+  score?: number;
 }
 
 export interface CreateTestSessionRequest {

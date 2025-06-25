@@ -14,8 +14,8 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { TestSessionView } from "@api/testSession";
+import { LoadingSpinner } from "@atoms/LoadingSpinner";
 import { getRoleDisplayName } from "@enums/Role";
-import { LoadingSpinner } from "../atoms/LoadingSpinner";
 
 interface SessionDetailsDialogProps {
   dialogOpen: boolean;
@@ -84,6 +84,13 @@ export const SessionDetailsDialog: React.FC<SessionDetailsDialogProps> = ({
                     <strong>End Time:</strong>{" "}
                     {new Date(selectedRow.endTime).toLocaleString()}
                   </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  {selectedRow.score != 0 && (
+                    <Typography>
+                      <strong>Score</strong> {selectedRow.score}
+                    </Typography>
+                  )}
                 </Grid>
               </Grid>
 

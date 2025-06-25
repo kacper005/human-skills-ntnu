@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 
 export const GameEmbed: React.FC = () => {
-  const theme = useTheme(); //
+  const theme = useTheme();
 
   React.useEffect(() => {
     // Create a script element
