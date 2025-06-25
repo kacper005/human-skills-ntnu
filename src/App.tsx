@@ -15,6 +15,7 @@ import { RoleProtectedRoute } from "@context/RoleProtectedRoute";
 import { Home } from "@pages/Home";
 import { SignIn } from "@pages/SignIn";
 import { SignUp } from "@pages/SignUp";
+import { Support } from "@pages/Support";
 import { NotFound } from "@pages/NotFound";
 import { Admin } from "@pages/Admin/Admin";
 import { UserProfile } from "@pages/UserProfile";
@@ -68,6 +69,7 @@ export const App: React.FC = () => {
             <Route path="/test/big5" element={<Questionnaire />} />
             <Route path="/test/int-fluid" element={<IntFluidController />} />
             <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/support" element={<Support />} />
             <Route path="/not-found" element={<NotFound />} />
 
             <Route element={<ProtectedRoute />}>

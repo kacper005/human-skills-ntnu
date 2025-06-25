@@ -7,6 +7,7 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import { Avatar, Divider, ListItemIcon, Typography } from "@mui/material";
 import {
   Login,
@@ -198,6 +199,14 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                       <Divider />
                     </>
                   )}
+
+                  <MenuItem onClick={() => navigate("/support")}>
+                    <ListItemIcon>
+                      <SupportAgentIcon fontSize="small" />
+                    </ListItemIcon>
+                    Support
+                  </MenuItem>
+                  <Divider />
 
                   {/* Dark Mode Toggle
                   <MenuItem onClick={handleDarkMode}>

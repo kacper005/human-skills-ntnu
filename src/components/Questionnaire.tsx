@@ -86,10 +86,8 @@ export const Questionnaire: React.FC = () => {
     setAnswers({ ...answers, [questionId]: event.target.value });
   };
 
-  const areCurrentPageQuestionsAnswered = (): boolean =>
-    paginatedQuestions.every(
-      (q) => answers[q.id] !== undefined && answers[q.id] !== ""
-    );
+  const areAllQuestionsAnswered = (): boolean =>
+    questions.every((q) => answers[q.id] !== undefined && answers[q.id] !== "");
 
   const fetchTestSessionResult = async (sessionId: number) => {
     setLoading(true);
@@ -246,7 +244,9 @@ export const Questionnaire: React.FC = () => {
                   <Button variant="outlined" onClick={() => navigate("/")}>
                     Back to Home
                   </Button>
-                  <InfoTooltip title="You can export your test result later, visiting 'My Test Sessions' page." />
+                  {isLoggedIn && (
+                    <InfoTooltip title="You can export your test result later, visiting 'My Test Sessions' page." />
+                  )}
                 </Box>
 
                 <Box sx={{ width: "100%", overflowX: "auto", mt: 3 }}>
@@ -427,18 +427,18 @@ export const Questionnaire: React.FC = () => {
             >
               <Tooltip
                 title={
-                  !areCurrentPageQuestionsAnswered()
+                  !areAllQuestionsAnswered()
                     ? "Please answer all the questions"
                     : ""
                 }
-                disableHoverListener={areCurrentPageQuestionsAnswered()}
+                disableHoverListener={areAllQuestionsAnswered()}
               >
                 <span>
                   <Button
                     variant="contained"
                     color="secondary"
                     onClick={handleSubmit}
-                    disabled={!areCurrentPageQuestionsAnswered()}
+                    disabled={!areAllQuestionsAnswered()}
                   >
                     Submit
                   </Button>
