@@ -1,6 +1,7 @@
+import React from "react";
 import { Card, CardContent, Typography, Box, useTheme } from "@mui/material";
 
-const GameEmbed = () => {
+export const Game: React.FC = () => {
   const theme = useTheme();
 
   return (
@@ -29,5 +30,3 @@ const GameEmbed = () => {
     </Box>
   );
 };
-
-export default GameEmbed;

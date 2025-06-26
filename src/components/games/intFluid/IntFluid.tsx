@@ -3,13 +3,24 @@ import Paper from "@mui/material/Paper";
 import Divider from "@mui/material/Divider";
 
 interface IntFluidProps {
-  gridImage: string;
-  choices: string[];
+  gridImage: string; // full base path without extension (e.g., "/games/intFluid/tiles/Q1/grid")
+  choices: string[]; // full base path without extension
   correctChoice: string;
   onChoiceClick: (choice: string) => void;
 }
 
-const IntFluid: React.FC<IntFluidProps> = ({
+const ImageWithFallback: React.FC<{
+  basePath: string;
+  alt: string;
+  style?: React.CSSProperties;
+}> = ({ basePath, alt, style }) => (
+  <picture>
+    <source srcSet={`${basePath}.png`} type="image/png" />
+    <img src={`${basePath}.png`} alt={alt} style={style} />
+  </picture>
+);
+
+export const IntFluid: React.FC<IntFluidProps> = ({
   gridImage,
   choices,
   onChoiceClick,
@@ -28,8 +39,8 @@ const IntFluid: React.FC<IntFluidProps> = ({
         }}
       >
         {/* Grid Image */}
-        <img
-          src={gridImage}
+        <ImageWithFallback
+          basePath={gridImage}
           alt="Grid"
           style={{
             width: "40vw",
@@ -60,8 +71,8 @@ const IntFluid: React.FC<IntFluidProps> = ({
               }}
               onClick={() => onChoiceClick(choice)}
             >
-              <img
-                src={choice}
+              <ImageWithFallback
+                basePath={choice}
                 alt={`Choice ${index}`}
                 style={{
                   width: "15vw",
@@ -71,12 +82,6 @@ const IntFluid: React.FC<IntFluidProps> = ({
                   objectFit: "contain",
                   transition: "transform 0.3s",
                 }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.transform = "scale(1.05)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.transform = "scale(1)")
-                }
               />
             </div>
           ))}
@@ -85,5 +90,3 @@ const IntFluid: React.FC<IntFluidProps> = ({
     </div>
   );
 };
-
-export default IntFluid;

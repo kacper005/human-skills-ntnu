@@ -1,10 +1,10 @@
-import { useEffect } from "react";
+import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 
-export default function GameEmbed() {
-  const theme = useTheme(); //
+export const GameEmbed: React.FC = () => {
+  const theme = useTheme();
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Create a script element
     const script = document.createElement("script");
     script.src = `https://cdn.htmlgames.com/embed.js?game=Daily2Queens&bgcolor=${
@@ -65,4 +65,4 @@ export default function GameEmbed() {
       ></Box>
     </Box>
   );
-}
+};

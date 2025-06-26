@@ -1,6 +1,6 @@
 import React from "react";
-import { Box, Typography, Button, Dialog, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Box, Typography, Button, Dialog, useTheme } from "@mui/material";
 
 interface GameInfoProps {
   gameInfo: Array<string>;
@@ -8,7 +8,7 @@ interface GameInfoProps {
   setGameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const GameInfo: React.FC<GameInfoProps> = ({
+export const GameInfo: React.FC<GameInfoProps> = ({
   gameInfo,
   gameModalOpen,
   setGameModalOpen,
@@ -85,5 +85,3 @@ const GameInfo: React.FC<GameInfoProps> = ({
     </Dialog>
   );
 };
-
-export default GameInfo;

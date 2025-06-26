@@ -1,20 +1,19 @@
 import React from "react";
 import { Card, CardContent, Typography, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 interface TestCardProps {
   title: string;
   description: string;
   type: string;
+  onClick?: () => void;
 }
 
-const TestCard: React.FC<TestCardProps> = ({ title, description, type }) => {
-  const navigate = useNavigate();
-
-  // React.useEffect(() => {
-  //   // Any side effects or navigation logic can go here
-  // }, [navigate]);
-
+export const TestCard: React.FC<TestCardProps> = ({
+  title,
+  //description,
+  type,
+  onClick = () => {},
+}) => {
   return (
     <Card
       elevation={0}
@@ -25,26 +24,22 @@ const TestCard: React.FC<TestCardProps> = ({ title, description, type }) => {
           transform: "scale(1.01)",
           boxShadow: 3,
         },
+        width: "100%",
+        maxWidth: 435,
+        mt: 1,
       }}
     >
       <CardContent>
         <Typography
           gutterBottom
-          variant="h5"
+          variant="h3"
           fontWeight="bold"
           component="div"
           color="secondary"
         >
           {title}
         </Typography>
-        <Typography
-          gutterBottom
-          variant="body1"
-          color="text.secondary"
-          style={{ minHeight: "3em" }}
-        >
-          {description}
-        </Typography>
+
         <Typography variant="body2" color="text.secondary">
           Type: {type}
         </Typography>
@@ -52,13 +47,7 @@ const TestCard: React.FC<TestCardProps> = ({ title, description, type }) => {
           variant="contained"
           color="secondary"
           style={{ marginTop: "12px", width: "100%" }}
-          onClick={() => {
-            if (type === "questionnaire") {
-              navigate("/test");
-            } else if (type === "game") {
-              navigate("/test2");
-            }
-          }}
+          onClick={onClick}
         >
           Take Test
         </Button>
@@ -66,5 +55,3 @@ const TestCard: React.FC<TestCardProps> = ({ title, description, type }) => {
     </Card>
   );
 };
-
-export default TestCard;

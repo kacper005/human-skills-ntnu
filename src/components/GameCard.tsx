@@ -11,7 +11,7 @@ interface GameCardProps {
   setGameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const GameCard: React.FC<GameCardProps> = ({
+export const GameCard: React.FC<GameCardProps> = ({
   title,
   description,
   type,
@@ -39,12 +39,13 @@ const GameCard: React.FC<GameCardProps> = ({
           transform: "scale(1.01)",
           boxShadow: theme.shadows[3],
         },
+        maxWidth: 435,
       }}
     >
       <CardContent>
         <Typography
           gutterBottom
-          variant="h5"
+          variant="h3"
           fontWeight="bold"
           component="div"
           color="secondary"
@@ -83,6 +84,7 @@ const GameCard: React.FC<GameCardProps> = ({
             },
           }}
           onClick={handleGameStart}
+          disabled
         >
           Play Game
         </Button>
@@ -90,5 +92,3 @@ const GameCard: React.FC<GameCardProps> = ({
     </Card>
   );
 };
-
-export default GameCard;
