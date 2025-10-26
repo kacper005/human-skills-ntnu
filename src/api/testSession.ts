@@ -54,3 +54,6 @@ export const createNewTestSession = (request: CreateTestSessionRequest) =>
 
 export const deleteTestSession = (id: number) =>
   axiosInstance.delete(`${BASE_URL}/delete/${id}`);
+
+export const updateTestSessionDescription = (id: number, description: string) =>
+  axiosInstance.put(`${BASE_URL}/update/${id}/description`, { description });
