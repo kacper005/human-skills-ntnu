@@ -307,18 +307,30 @@ export const Questionnaire: React.FC = () => {
             Respond to this assessment consisting of {questions.length}{" "}
             statements by indicating your level of agreement.
           </Typography>
-
           <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            mt={2}
-            mb={2}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mt: 2,
+              mb: 2,
+              overflowX: "auto",
+              whiteSpace: "nowrap",
+              px: 1,
+            }}
           >
-            <Typography variant="body2" sx={{ mr: 2 }}>
+            <Typography variant="body2" sx={{ mr: 2, flexShrink: 0 }}>
               Disagree
             </Typography>
-            <RadioGroup row>
+
+            <RadioGroup
+              row
+              sx={{
+                flexWrap: "nowrap",
+                justifyContent: "center",
+                minWidth: 300,
+              }}
+            >
               {[1, 2, 3, 4, 5].map((level) => (
                 <Tooltip key={level} title={getLabelForLevel(level)} arrow>
                   <Radio
@@ -329,12 +341,14 @@ export const Questionnaire: React.FC = () => {
                         color: getRadioColor(level),
                       },
                       mx: 0.5,
+                      flexShrink: 0,
                     }}
                   />
                 </Tooltip>
               ))}
             </RadioGroup>
-            <Typography variant="body2" sx={{ ml: 2 }}>
+
+            <Typography variant="body2" sx={{ ml: 2, flexShrink: 0 }}>
               Agree
             </Typography>
           </Box>

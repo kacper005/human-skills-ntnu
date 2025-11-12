@@ -105,7 +105,15 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             component={Link}
             to="/home"
           >
-            <img src="/HumanSkillsLogo.svg" alt="Logo" style={{ height: 60 }} />
+            <Box
+              component="img"
+              src="/HumanSkillsLogo.svg"
+              alt="Logo"
+              sx={{
+                height: { xs: 40, sm: 50, md: 60 },
+                transition: "height 0.2s ease-in-out",
+              }}
+            />
           </Typography>
 
           <Box sx={{ flexGrow: 1 }} />
