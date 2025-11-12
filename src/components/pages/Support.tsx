@@ -8,9 +8,7 @@ export const Support: React.FC = () => {
         If you need help or want to report an issue, please contact our support
         team.
       </p>
-      <p>
-        Email: <a href="mailto:s8df6g98s@gmail.com">HumanSkills@gmail.com</a>
-      </p>
+      <p>Contact information to support team will be added here. Stay tuned!</p>
     </div>
   );
 };
