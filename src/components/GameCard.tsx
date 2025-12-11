@@ -9,6 +9,9 @@ interface GameCardProps {
   descriptionFull: string;
   setGameInfo: React.Dispatch<React.SetStateAction<string[]>>;
   setGameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setGameRoute: React.Dispatch<React.SetStateAction<string>>;
+  route: string;
+  disabled: boolean;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -19,12 +22,16 @@ export const GameCard: React.FC<GameCardProps> = ({
   descriptionFull,
   setGameInfo,
   setGameModalOpen,
+  route,
+  setGameRoute,
+  disabled,
 }) => {
   const theme = useTheme();
 
   const handleGameStart = () => {
     setGameModalOpen(true);
     setGameInfo([title, descriptionFull]);
+    setGameRoute(route);
   };
 
   return (
@@ -84,7 +91,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             },
           }}
           onClick={handleGameStart}
-          disabled
+          disabled={disabled}
         >
           Play Game
         </Button>

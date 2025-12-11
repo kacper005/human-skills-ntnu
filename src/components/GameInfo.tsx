@@ -6,18 +6,27 @@ interface GameInfoProps {
   gameInfo: Array<string>;
   gameModalOpen: boolean;
   setGameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  gameRoute: string;
 }
 
 export const GameInfo: React.FC<GameInfoProps> = ({
   gameInfo,
   gameModalOpen,
   setGameModalOpen,
+  gameRoute,
 }) => {
   const theme = useTheme();
   const navigate = useNavigate();
 
   const handleClose = () => {
     setGameModalOpen(false);
+  };
+
+  const handleStartGame = () => {
+    handleClose();
+    if (gameRoute) {
+      navigate(gameRoute);
+    }
   };
 
   return (
@@ -74,10 +83,7 @@ export const GameInfo: React.FC<GameInfoProps> = ({
                   : theme.palette.primary.dark,
             },
           }}
-          onClick={() => {
-            handleClose();
-            navigate("/game");
-          }}
+          onClick={handleStartGame}
         >
           Start
         </Button>

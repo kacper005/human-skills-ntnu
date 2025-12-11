@@ -12,6 +12,8 @@ interface Game {
   difficulty: string;
   image: string;
   descriptionFull: string;
+  route: string;
+  disabled: boolean;
 }
 
 const gameData: Game[] = [
@@ -26,6 +28,8 @@ const gameData: Game[] = [
     descriptionFull: `This is an Attention Game: It records your ability to focus (pay attention) to the right things (ignore everything else).
         \n\nIndicate the direction of the space shuttle in the middle (ignore all others - if any). You respond by using "left" or "right" arrow on your keyboard (or using buttons on the screen).
         \n\nThe game will last for 1 minute; score will be calculated based on number of answers and number of correct answers i.e. a combination of speed and accuracy.`,
+    route: "/attention-game",
+    disabled: false,
   },
   {
     id: 2,
@@ -39,6 +43,8 @@ const gameData: Game[] = [
         \n\nMaximize your points collection by inflating the balloon to its limit - you inflate by pressing "Inflate Balloon" and you collect your gains by pressing "$$$ Collected".
         \n\nThe more the balloon is inflated the more you collect, but at the risk of the balloon bursting (and you lose your money); the inflation burst point of the balloon changes randomly.
         \n\nThe goal is to collect as much points ($$$) as possible over 10 attempts - there is a 1-minute time cap.`,
+    route: "/balloon-game",
+    disabled: true,
   },
   {
     id: 3,
@@ -50,12 +56,15 @@ const gameData: Game[] = [
     descriptionFull: `This is a Cognitive Flexibility Game: it records your ability to detect, apply and adapt to change.
         \n\nPress on the correct card option (out of 4 at the top) that matches the master card (bottom section) - following the identified pattern (color of items, number of items or shape of items); the pattern will change at irregular intervals.
         \n\nThe game will last for 2 minutes; the score will be calculated based on number of answers and number of correct answers i.e. a combination of speed and accuracy.`,
+    route: "/cogflex-game",
+    disabled: true,
   },
 ];
 
 export const GameCardGrid: React.FC = () => {
   const [gameInfo, setGameInfo] = React.useState<string[]>(["", ""]);
   const [gameModalOpen, setGameModalOpen] = React.useState(false);
+  const [gameRoute, setGameRoute] = React.useState<string>("");
 
   return (
     <>
@@ -63,6 +72,7 @@ export const GameCardGrid: React.FC = () => {
         gameInfo={gameInfo}
         gameModalOpen={gameModalOpen}
         setGameModalOpen={setGameModalOpen}
+        gameRoute={gameRoute}
       />
 
       <Typography
@@ -71,7 +81,7 @@ export const GameCardGrid: React.FC = () => {
         color="secondary"
         paddingBottom="24px"
       >
-        Cognitive Games (Comming Soon)
+        Cognitive Games (Coming Soon)
       </Typography>
       <Grid
         container
@@ -88,6 +98,9 @@ export const GameCardGrid: React.FC = () => {
               descriptionFull={game.descriptionFull}
               setGameInfo={setGameInfo}
               setGameModalOpen={setGameModalOpen}
+              route={game.route}
+              setGameRoute={setGameRoute}
+              disabled={game.disabled}
             />
           </Grid>
         ))}
