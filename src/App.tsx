@@ -27,7 +27,7 @@ import { AdminGameTemplates } from "@pages/Admin/AdminGameTemplates";
 import { AdminStudyPrograms } from "@pages/Admin/AdminStudyPrograms";
 import theme from "./components/theme";
 import { Game } from "./components/Game";
-import AttentionGame from "./components/games/attention/AttentionGame";
+import AttentionGameController from "./components/games/attention/AttentionGameController";
 import { Questionnaire } from "./components/Questionnaire";
 import { IntFluidController } from "./components/games/intFluid/IntFluidController";
 import { AppHeader } from "@organisms/AppHeader";
@@ -72,7 +72,7 @@ export const App: React.FC = () => {
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/support" element={<Support />} />
             <Route path="/not-found" element={<NotFound />} />
-            <Route path="/attention-game" element={<AttentionGame />} />
+            <Route path="/attention-game" element={<AttentionGameController />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/user-profile" element={<UserProfile />} />
