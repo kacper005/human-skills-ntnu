@@ -35,7 +35,7 @@ export interface AttentionGameActions {
   handleAnswer: (direction: Direction) => void
 }
 
-export function useAttentionGameController2(): AttentionGameState & AttentionGameActions {
+export function useAttentionGameController(): AttentionGameState & AttentionGameActions {
 
   const [score, setScore] = useState(0)
   const [timeLeft, setTimeLeft] = useState(ATTENTION_GAME_DURATION)

@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import type { Direction } from "../types";
-import { useAttentionGameController2 } from "./AttentionGameController2";
+import { useAttentionGameController } from "./AttentionGameController";
 
 import { ArrowIcon } from "../../atoms";
 import {
@@ -22,13 +22,13 @@ import {
   GameHeader,
 } from "../../organisms";
 
-interface AttentionGame2Props {
+interface AttentionGameProps {
   onBack?: () => void;
 }
 
-export function AttentionGame2({ onBack }: AttentionGame2Props) {
+export function AttentionGame({ onBack }: AttentionGameProps) {
   const navigate = useNavigate();
-  const game = useAttentionGameController2();
+  const game = useAttentionGameController();
 
   const handleBack = React.useCallback(() => {
     if (onBack) {
@@ -197,4 +197,4 @@ export function AttentionGame2({ onBack }: AttentionGame2Props) {
   );
 }
 
-export default AttentionGame2;
+export default AttentionGame;

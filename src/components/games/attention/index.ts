@@ -1,3 +1,3 @@
-export { default as AttentionGame2 } from "./AttentionGame2"
-export { useAttentionGame2 } from "./useAttentionGame2"
+export { default as AttentionGame } from "./AttentionGame"
+export { useAttentionGame } from "./useAttentionGame"
 export { AttentionGameView } from "./AttentionGameView"
