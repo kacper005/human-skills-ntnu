@@ -12,7 +12,6 @@ export function GameOverScreen({ children, onPlayAgain, onHome }: GameOverScreen
     <div
       style={{
         minHeight: "100vh",
-        background: "#f1f5f9",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
