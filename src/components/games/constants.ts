@@ -4,6 +4,13 @@ export const MAX_MULTIPLIER = 10
 export const STREAK_FOR_MULTIPLIER = 4
 
 
+export const TOTAL_BALLOONS = 10
+export const MAX_POP_THRESHOLD = 20
+export const MIN_POP_THRESHOLD = 1
+export const BALLOON_SIZE_INCREMENT = 15
+export const INITIAL_BALLOON_SIZE = 100
+
+
 export const SHUTTLE_FORMATIONS = [
 
   // Horizontal line

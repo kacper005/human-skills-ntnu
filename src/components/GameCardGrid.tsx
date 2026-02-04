@@ -44,7 +44,7 @@ const gameData: Game[] = [
         \n\nThe more the balloon is inflated the more you collect, but at the risk of the balloon bursting (and you lose your money); the inflation burst point of the balloon changes randomly.
         \n\nThe goal is to collect as much points ($$$) as possible over 10 attempts - there is a 1-minute time cap.`,
     route: "/balloon-game",
-    disabled: true,
+    disabled: false,
   },
   {
     id: 3,
@@ -57,7 +57,7 @@ const gameData: Game[] = [
         \n\nPress on the correct card option (out of 4 at the top) that matches the master card (bottom section) - following the identified pattern (color of items, number of items or shape of items); the pattern will change at irregular intervals.
         \n\nThe game will last for 2 minutes; the score will be calculated based on number of answers and number of correct answers i.e. a combination of speed and accuracy.`,
     route: "/cogflex-game",
-    disabled: true,
+    disabled: false,
   },
 ];
 
@@ -81,7 +81,7 @@ export const GameCardGrid: React.FC = () => {
         color="secondary"
         paddingBottom="24px"
       >
-        Cognitive Games (Coming Soon)
+        Cognitive Games
       </Typography>
       <Grid
         container
