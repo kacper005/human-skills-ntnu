@@ -9,8 +9,11 @@ interface CloudProps {
 export function Cloud({ style }: CloudProps) {
   return (
     <div
-      className = "absolute bg-white rounded-full opacity-80"
       style={{
+        position: "absolute",
+        background: "white",
+        borderRadius: "9999px",
+        opacity: 0.8,
         filter: "blur(2px)",
         ...style,
       }}
