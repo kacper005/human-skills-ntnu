@@ -29,6 +29,7 @@ import theme from "./components/theme";
 import { Game } from "./components/Game";
 import { AttentionGame } from "./components/games/attention/AttentionGame";
 import { BalloonGame } from "./components/games/balloon/BalloonGame";
+import { CogFlexGame } from "./components/games/cogflex/CogFlexGame";
 import { Questionnaire } from "./components/Questionnaire";
 import { IntFluidController } from "./components/games/intFluid/IntFluidController";
 import { AppHeader } from "@organisms/AppHeader";
@@ -75,6 +76,7 @@ export const App: React.FC = () => {
             <Route path="/not-found" element={<NotFound />} />
             <Route path="/attention-game" element={<AttentionGame />} />
             <Route path="/balloon-game" element={<BalloonGame />} />
+            <Route path="/cogflex-game" element={<CogFlexGame />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/user-profile" element={<UserProfile />} />
