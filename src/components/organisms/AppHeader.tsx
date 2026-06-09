@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
@@ -8,7 +8,8 @@ import Toolbar from "@mui/material/Toolbar";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
-import { Avatar, Divider, ListItemIcon, Typography } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Avatar, Button, Divider, ListItemIcon, Typography } from "@mui/material";
 import {
   Login,
   Logout,
@@ -39,6 +40,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
+  const location = useLocation();
+  const showBackToHome = location.pathname !== "/home";
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -107,6 +110,23 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           >
             <img src="/HumanSkillsLogo.svg" alt="Logo" style={{ height: 60 }} />
           </Typography>
+
+          {showBackToHome && (
+            <Button
+              color="inherit"
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate("/home")}
+              sx={{
+                ml: 40,
+                textTransform: "none",
+                fontWeight: 600,
+                borderRadius: 2,
+                "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
+              }}
+            >
+              Back to Home
+            </Button>
+          )}
 
           <Box sx={{ flexGrow: 1 }} />
 
