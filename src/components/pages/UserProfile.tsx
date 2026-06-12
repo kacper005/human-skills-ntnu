@@ -1,406 +1,522 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Paper,
+  Box,
+  Container,
   Typography,
-  TextField,
+  Card,
+  CardContent,
   Button,
-  Grid,
+  Avatar,
+  Divider,
+  Chip,
+  TextField,
   MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { useAuth } from "@hooks/useAuth";
+import { showToast } from "@atoms/Toast";
+import {
+  deleteUserMe,
+  updateUserMe,
+  UpdateUserMeDto,
+} from "@api/userApi";
 import {
   getStudentProfile,
-  createStudentProfile,
-  CreateStudentProfileDto,
+  updateStudentProfile,
   StudentProfile,
 } from "@api/studentProfileApi";
 import { getStudyPrograms, StudyProgram } from "@api/studyProgramApi";
-import { UpdateUserMeDto, deleteUserMe, updateUserMe } from "@api/userApi";
-import { useAuth } from "@hooks/useAuth";
-import { showToast } from "@atoms/Toast";
-import { ConfirmDialog } from "@atoms/ConfirmDialog";
-import { LoadingSpinner } from "@atoms/LoadingSpinner";
-import { getRoleDisplayName } from "@enums/Role";
-import { getCampusDisplayName } from "@enums/Campus";
 import { Gender, getGenderDisplayName } from "@enums/Gender";
+import { Role, getRoleDisplayName } from "@enums/Role";
+
+interface UserDraft {
+  firstName: string;
+  lastName: string;
+  email: string;
+  gender: Gender | "";
+}
+
+interface StudentDraft {
+  studyProgramId: number | "";
+  yearOfStudy: number | "";
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        py: 1.5,
+        gap: 2,
+      }}
+    >
+      <Typography variant="body2" sx={{ color: "#64748b", fontWeight: 600 }}>
+        {label}
+      </Typography>
+      <Typography
+        variant="body1"
+        sx={{ color: "#1e293b", fontWeight: 500, textAlign: "right" }}
+      >
+        {value}
+      </Typography>
+    </Box>
+  );
+}
 
 export const UserProfile: React.FC = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [open, setOpen] = React.useState(false);
-  const [userEditMode, setUserEditMode] = React.useState(false);
-  const [studentEditMode, setStudentEditMode] = React.useState(false);
-  const [studentProfile, setStudentProfile] =
-    React.useState<StudentProfile | null>(null);
-  const [studyPrograms, setStudyPrograms] = React.useState<StudyProgram[]>([]);
-  const [userData, setUserData] = React.useState<UpdateUserMeDto>({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    gender: user?.gender || "",
+
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+
+  const [draft, setDraft] = React.useState<UserDraft>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    gender: "",
   });
-  const [formData, setFormData] = React.useState<CreateStudentProfileDto>({
+
+  const [studentProfile, setStudentProfile] = React.useState<StudentProfile | null>(
+    null
+  );
+  const [studyPrograms, setStudyPrograms] = React.useState<StudyProgram[]>([]);
+  const [studentDraft, setStudentDraft] = React.useState<StudentDraft>({
     studyProgramId: "",
     yearOfStudy: "",
   });
 
+  const isStudent = user?.role === Role.STUDENT;
+
   React.useEffect(() => {
-    fetchStudyPrograms();
-    if (user && user.role === "STUDENT") {
-      fetchStudentProfile();
-    }
+    if (!user) return;
+
+    setDraft({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      gender: user.gender,
+    });
   }, [user]);
 
-  const fetchStudentProfile = async () => {
-    try {
-      const res = await getStudentProfile();
-      setStudentProfile(res.data);
-      setFormData({
-        studyProgramId: res.data.studyProgramId || "",
-        yearOfStudy: res.data.yearOfStudy || "",
-      });
-    } catch {
-      setFormData({
-        studyProgramId: "",
-        yearOfStudy: "",
-      });
-    }
-  };
+  React.useEffect(() => {
+    const loadStudentData = async () => {
+      if (!isStudent) {
+        setStudentProfile(null);
+        setStudyPrograms([]);
+        setStudentDraft({ studyProgramId: "", yearOfStudy: "" });
+        return;
+      }
 
-  const fetchStudyPrograms = async () => {
-    try {
-      const res = await getStudyPrograms();
-      setStudyPrograms(res.data);
-    } catch (error) {
-      console.error("Failed to fetch study programs", error);
-    }
-  };
+      try {
+        const [profileRes, studyProgramsRes] = await Promise.all([
+          getStudentProfile(),
+          getStudyPrograms(),
+        ]);
 
-  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value });
-  };
-
-  const handleStudentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "yearOfStudy" && value !== "" ? Number(value) : value,
-    }));
-  };
-
-  const handleUserSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const updatedUserData: UpdateUserMeDto = {
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      gender: userData.gender,
+        const profile = profileRes.data;
+        setStudentProfile(profile);
+        setStudyPrograms(studyProgramsRes.data);
+        setStudentDraft({
+          studyProgramId: profile.studyProgramId,
+          yearOfStudy: profile.yearOfStudy,
+        });
+      } catch (error) {
+        console.error("Failed to load student profile data:", error);
+        showToast({
+          message: "Could not load student profile details",
+          type: "warning",
+        });
+      }
     };
-    try {
-      await updateUserMe(updatedUserData);
-      showToast({ message: "User info updated", type: "success" });
-      setUserEditMode(false);
-    } catch (error) {
-      console.error(error);
-      showToast({ message: "Failed to update user info", type: "error" });
-    }
-  };
 
-  const handleStudentProfileSave = async () => {
-    try {
-      await createStudentProfile(formData);
-      showToast({ message: "Student profile saved", type: "success" });
-      setStudentEditMode(false);
-      fetchStudentProfile();
-    } catch (error) {
-      console.error("Error saving student profile", error);
-      showToast({ message: "Failed to save student profile", type: "error" });
-    }
-  };
+    loadStudentData();
+  }, [isStudent]);
 
-  const handleDeleteAccount = async () => {
-    try {
-      await deleteUserMe();
-      showToast({ message: "Account deleted", type: "success" });
-      setOpen(false);
-      logout();
-    } catch (error) {
-      console.error("Account deletion failed", error);
-      showToast({ message: "Failed to delete account", type: "error" });
-    } finally {
-      navigate("/");
-    }
-  };
-
-  if (loading || !user) {
-    return <LoadingSpinner />;
+  if (!user) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 6 }}>
+        <Typography sx={{ color: "#64748b" }}>
+          Loading user profile...
+        </Typography>
+      </Container>
+    );
   }
 
+  const programNameById = new Map(
+    studyPrograms.map((p) => [Number(p.id), p.name] as const)
+  );
+
+  const displayStudyProgram =
+    studentProfile?.studyProgramId != null
+      ? programNameById.get(studentProfile.studyProgramId) || "Unknown Program"
+      : "-";
+
+  const startEdit = () => {
+    setDraft({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      gender: user.gender,
+    });
+
+    if (studentProfile) {
+      setStudentDraft({
+        studyProgramId: studentProfile.studyProgramId,
+        yearOfStudy: studentProfile.yearOfStudy,
+      });
+    }
+
+    setIsEditing(true);
+  };
+
+  const cancelEdit = () => {
+    setDraft({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      gender: user.gender,
+    });
+
+    if (studentProfile) {
+      setStudentDraft({
+        studyProgramId: studentProfile.studyProgramId,
+        yearOfStudy: studentProfile.yearOfStudy,
+      });
+    }
+
+    setIsEditing(false);
+  };
+
+  const updateField = (field: keyof UserDraft, value: string) => {
+    setDraft((prev) => ({ ...prev, [field]: value as UserDraft[typeof field] }));
+  };
+
+  const saveEdit = async () => {
+    if (!draft.firstName.trim() || !draft.lastName.trim()) {
+      showToast({ message: "First name and last name are required", type: "warning" });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload: UpdateUserMeDto = {
+        firstName: draft.firstName.trim(),
+        lastName: draft.lastName.trim(),
+        gender: draft.gender,
+      };
+
+      await updateUserMe(payload);
+
+      if (isStudent && studentProfile) {
+        await updateStudentProfile({
+          studyProgramId: studentDraft.studyProgramId,
+          yearOfStudy: studentDraft.yearOfStudy,
+        });
+      }
+
+      showToast({
+        message: "Profile updated. Reloading account data...",
+        type: "success",
+      });
+
+      setIsEditing(false);
+      navigate(0);
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+      showToast({ message: "Failed to update profile", type: "error" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    setDeleting(true);
+    try {
+      await deleteUserMe();
+      showToast({ message: "Account deleted successfully", type: "success" });
+      logout();
+      navigate("/home");
+    } catch (error) {
+      console.error("Failed to delete account:", error);
+      showToast({ message: "Failed to delete account", type: "error" });
+    } finally {
+      setDeleting(false);
+      setDeleteOpen(false);
+    }
+  };
+
   return (
-    <div>
-      <div>
-        <Grid
-          container
-          spacing={4}
-          justifyContent="center"
-          alignItems="stretch"
-        >
-          {/* User Profile Card */}{" "}
-          <Grid item>
-            <Paper
-              elevation={4}
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f1f5f9" }}>
+      <Container maxWidth="sm" sx={{ py: 5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+          <PersonIcon sx={{ color: "#7c3aed", fontSize: 28 }} />
+          <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b" }}>
+            My Profile
+          </Typography>
+        </Box>
+
+        <Card sx={{ borderRadius: 3, overflow: "hidden" }}>
+          <Box
+            sx={{
+              backgroundImage: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)",
+              p: 3,
+              display: "flex",
+              alignItems: "center",
+              gap: 2.5,
+            }}
+          >
+            <Avatar
               sx={{
-                width: 400,
-                padding: 4,
-                borderRadius: 3,
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
+                width: 72,
+                height: 72,
+                bgcolor: "#f97316",
+                fontSize: "1.75rem",
+                fontWeight: 700,
               }}
             >
-              <Typography variant="h5" gutterBottom sx={{ marginBottom: 2 }}>
-                User Profile
+              {user.firstName[0]}
+              {user.lastName[0]}
+            </Avatar>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: "white" }}>
+                {user.firstName} {user.lastName}
               </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <TextField
-                    label="First Name"
-                    name="firstName"
-                    value={userData.firstName}
-                    onChange={handleUserChange}
-                    fullWidth
-                    disabled={!userEditMode}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Last Name"
-                    name="lastName"
-                    value={userData.lastName}
-                    onChange={handleUserChange}
-                    fullWidth
-                    disabled={!userEditMode}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Email"
-                    value={user.email}
-                    fullWidth
-                    disabled
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    select
-                    label="Gender"
-                    name="gender"
-                    value={userData.gender}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setUserData((prev) => ({
-                        ...prev,
-                        gender:
-                          value !== undefined && value !== null
-                            ? (value as Gender)
-                            : "",
-                      }));
-                    }}
-                    disabled={!userEditMode}
-                    fullWidth
-                  >
-                    {Object.values(Gender).map((g) => (
-                      <MenuItem key={g} value={g}>
-                        {getGenderDisplayName(g)}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Role"
-                    value={getRoleDisplayName(user.role)}
-                    fullWidth
-                    disabled
-                  />
-                </Grid>
-              </Grid>
-              <Grid item xs={12}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: 8,
-                    marginTop: 16,
-                  }}
-                >
-                  {userEditMode ? (
-                    <>
-                      <Button
-                        variant="outlined"
-                        onClick={() => setUserEditMode(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button variant="contained" onClick={handleUserSave}>
-                        Save
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      onClick={() => setUserEditMode(true)}
-                    >
-                      Edit Profile
-                    </Button>
-                  )}
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => setOpen(true)}
-                  >
-                    Delete Account
-                  </Button>
-                </div>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item>
-            {/* Student Profile Card */}
-            {user?.role === "STUDENT" && (
-              <Paper
-                elevation={4}
+              <Chip
+                label={getRoleDisplayName(user.role)}
+                size="small"
                 sx={{
-                  width: 400,
-                  padding: 4,
-                  borderRadius: 3,
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
+                  bgcolor: "rgba(255,255,255,0.2)",
+                  color: "white",
+                  fontWeight: 600,
+                  mt: 0.5,
                 }}
-              >
-                <Typography variant="h5" gutterBottom sx={{ marginBottom: 2 }}>
-                  Student Profile
-                </Typography>
+              />
+            </Box>
+          </Box>
 
-                {studentProfile || studentEditMode ? (
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <TextField
-                        select
-                        label="Study Program"
-                        name="studyProgramId"
-                        value={formData.studyProgramId}
-                        onChange={handleStudentChange}
-                        fullWidth
-                        disabled={!studentEditMode}
-                      >
-                        <MenuItem value="">
-                          <em>Select Study Program</em>
-                        </MenuItem>
-                        {studyPrograms.map((program) => (
-                          <MenuItem key={program.id} value={program.id}>
-                            {program.name}{" "}
-                            {`(${getCampusDisplayName(program.campus)})`}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        select
-                        label="Start Year"
-                        name="yearOfStudy"
-                        value={formData.yearOfStudy || ""}
-                        onChange={handleStudentChange}
-                        fullWidth
-                        disabled={!studentEditMode}
-                      >
-                        <MenuItem value="">
-                          <em>Select Year</em>
-                        </MenuItem>
-                        {[...Array(4)].map((_, i) => {
-                          const year = new Date().getFullYear() - i;
-                          return (
-                            <MenuItem key={year} value={year}>
-                              {year}
-                            </MenuItem>
-                          );
-                        })}
-                      </TextField>
-                    </Grid>
+          <CardContent sx={{ p: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 1,
+              }}
+            >
+              <Typography variant="overline" sx={{ color: "#94a3b8", fontWeight: 700 }}>
+                Account Information
+              </Typography>
+              {!isEditing && (
+                <Button
+                  size="small"
+                  startIcon={<EditIcon />}
+                  onClick={startEdit}
+                  sx={{ color: "#7c3aed", fontWeight: 600 }}
+                >
+                  Edit Profile
+                </Button>
+              )}
+            </Box>
 
-                    <Grid item xs={12}>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 8,
-                          marginTop: "auto",
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        {studentEditMode ? (
-                          <>
-                            <Button
-                              onClick={() => setStudentEditMode(false)}
-                              variant="outlined"
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              variant="contained"
-                              onClick={handleStudentProfileSave}
-                            >
-                              Save
-                            </Button>
-                          </>
-                        ) : (
-                          <Button
-                            variant="contained"
-                            onClick={() => setStudentEditMode(true)}
-                          >
-                            {studentProfile
-                              ? "Edit Student Info"
-                              : "Create Profile"}
-                          </Button>
-                        )}
-                      </div>
-                    </Grid>
-                  </Grid>
-                ) : (
+            {!isEditing && (
+              <Box>
+                <InfoRow label="First Name" value={user.firstName} />
+                <Divider />
+                <InfoRow label="Last Name" value={user.lastName} />
+                <Divider />
+                <InfoRow label="Email" value={user.email} />
+                <Divider />
+                <InfoRow label="Gender" value={getGenderDisplayName(user.gender)} />
+                <Divider />
+                <InfoRow label="Role" value={getRoleDisplayName(user.role)} />
+
+                {isStudent && (
                   <>
                     <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      gutterBottom
+                      variant="overline"
+                      sx={{ color: "#94a3b8", fontWeight: 700, display: "block", mt: 3 }}
                     >
-                      No student profile available.
+                      Student Profile
                     </Typography>
-                    <Button
-                      variant="contained"
-                      onClick={() => setStudentEditMode(true)}
-                      fullWidth
-                    >
-                      Add Student Profile
-                    </Button>
+                    <InfoRow label="Study Program" value={displayStudyProgram} />
+                    <Divider />
+                    <InfoRow
+                      label="Start Year"
+                      value={String(studentProfile?.yearOfStudy ?? "-")}
+                    />
                   </>
                 )}
-              </Paper>
+              </Box>
             )}
-          </Grid>
-          <ConfirmDialog
-            open={open}
-            title="Delete Account"
-            content="Are you sure you want to delete your account? This action cannot be undone."
-            confirmText="Delete"
-            cancelText="Cancel"
-            confirmationWord="Delete"
-            confirmationPrompt='Type "Delete" to confirm.'
-            onClose={() => setOpen(false)}
-            onConfirm={handleDeleteAccount}
-          />
-        </Grid>
-      </div>
-    </div>
+
+            {isEditing && (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  <TextField
+                    label="First Name"
+                    value={draft.firstName}
+                    onChange={(e) => updateField("firstName", e.target.value)}
+                    fullWidth
+                    size="small"
+                  />
+                  <TextField
+                    label="Last Name"
+                    value={draft.lastName}
+                    onChange={(e) => updateField("lastName", e.target.value)}
+                    fullWidth
+                    size="small"
+                  />
+                </Box>
+
+                <TextField label="Email" value={draft.email} fullWidth size="small" disabled />
+
+                <TextField
+                  label="Gender"
+                  select
+                  value={draft.gender}
+                  onChange={(e) => updateField("gender", e.target.value)}
+                  fullWidth
+                  size="small"
+                >
+                  <MenuItem value={Gender.MALE}>Male</MenuItem>
+                  <MenuItem value={Gender.FEMALE}>Female</MenuItem>
+                  <MenuItem value={Gender.UNIDENTIFIED}>Unidentified</MenuItem>
+                </TextField>
+
+                {isStudent && (
+                  <>
+                    <TextField
+                      label="Study Program"
+                      select
+                      value={studentDraft.studyProgramId}
+                      onChange={(e) =>
+                        setStudentDraft((prev) => ({
+                          ...prev,
+                          studyProgramId: Number(e.target.value),
+                        }))
+                      }
+                      fullWidth
+                      size="small"
+                    >
+                      {studyPrograms.map((program) => (
+                        <MenuItem key={program.id} value={Number(program.id)}>
+                          {program.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
+                    <TextField
+                      label="Start Year"
+                      type="number"
+                      value={studentDraft.yearOfStudy}
+                      onChange={(e) =>
+                        setStudentDraft((prev) => ({
+                          ...prev,
+                          yearOfStudy: Number(e.target.value),
+                        }))
+                      }
+                      fullWidth
+                      size="small"
+                    />
+                  </>
+                )}
+
+                <Box sx={{ display: "flex", gap: 1.5, mt: 1 }}>
+                  <Button
+                    variant="contained"
+                    startIcon={<SaveIcon />}
+                    onClick={saveEdit}
+                    disabled={saving}
+                    sx={{ bgcolor: "#7c3aed", "&:hover": { bgcolor: "#6d28d9" }, fontWeight: 600 }}
+                  >
+                    {saving ? "Saving..." : "Save"}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<CloseIcon />}
+                    onClick={cancelEdit}
+                    disabled={saving}
+                    sx={{ color: "#64748b", borderColor: "#cbd5e1", fontWeight: 600 }}
+                  >
+                    Cancel
+                  </Button>
+                </Box>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card sx={{ borderRadius: 3, mt: 3, border: "1px solid #fecaca" }}>
+          <CardContent sx={{ p: 3 }}>
+            <Typography variant="overline" sx={{ color: "#ef4444", fontWeight: 700 }}>
+              Danger Zone
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mt: 1,
+                gap: 2,
+              }}
+            >
+              <Box>
+                <Typography variant="body1" sx={{ fontWeight: 600, color: "#1e293b" }}>
+                  Delete Account
+                </Typography>
+                <Typography variant="body2" sx={{ color: "#64748b" }}>
+                  Permanently remove your account and all associated data.
+                </Typography>
+              </Box>
+              <Button
+                variant="outlined"
+                color="error"
+                startIcon={<DeleteForeverIcon />}
+                onClick={() => setDeleteOpen(true)}
+                sx={{ fontWeight: 600, flexShrink: 0 }}
+              >
+                Delete
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
+
+      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>
+        <DialogTitle sx={{ fontWeight: 700 }}>Delete your account?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            This action cannot be undone. Your account and all associated data will be permanently deleted.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setDeleteOpen(false)}
+            sx={{ color: "#64748b", fontWeight: 600 }}
+            disabled={deleting}
+          >
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} variant="contained" color="error" sx={{ fontWeight: 600 }} disabled={deleting}>
+            {deleting ? "Deleting..." : "Delete Account"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
