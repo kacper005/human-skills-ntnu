@@ -13,8 +13,7 @@ import { ScrollToTop } from "@hooks/ScrollToTop";
 import { ProtectedRoute } from "@context/ProtectedRoute";
 import { RoleProtectedRoute } from "@context/RoleProtectedRoute";
 import { Home } from "@pages/Home";
-import { SignIn } from "@pages/SignIn";
-import { SignUp } from "@pages/SignUp";
+import AuthDialog from "@pages/AuthDialog";
 import { Support } from "@pages/Support";
 import { NotFound } from "@pages/NotFound";
 import { Admin } from "@pages/Admin/Admin";
@@ -63,7 +62,11 @@ export const App: React.FC = () => {
           darkMode={darkMode}
           setDarkMode={setDarkMode}
         />
-        <SignIn isOpen={isOpen} setIsOpen={setIsOpen} />
+        <AuthDialog 
+          open={isOpen} 
+          onClose={() => setIsOpen(false)} 
+          onAuthenticated={() => setIsOpen(false)} 
+        />
         <div className="app">
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
@@ -71,7 +74,7 @@ export const App: React.FC = () => {
             <Route path="/game" element={<Game />} />
             <Route path="/test/big5" element={<Questionnaire />} />
             <Route path="/test/int-fluid" element={<IntFluidController />} />
-            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/sign-up" element={<Navigate to="/home" replace />} />
             <Route path="/support" element={<Support />} />
             <Route path="/not-found" element={<NotFound />} />
             <Route path="/attention-game" element={<AttentionGame />} />
