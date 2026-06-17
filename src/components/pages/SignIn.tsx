@@ -1,160 +1,140 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import {
+  Box,
   TextField,
   Button,
-  Container,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  useTheme,
   Typography,
+  IconButton,
+  InputAdornment,
+  CircularProgress,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { SocialLogins } from "./AuthShared";
 import { useAuth } from "@hooks/useAuth";
 import { showToast } from "@atoms/Toast";
 import { AuthProvider as AuthProviderType } from "@enums/AuthProvider";
 
-interface LoginProps {
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+interface SignInProps {
+  onAuthenticated: () => void;
+  onSwitchToSignUp: () => void;
 }
 
-export const SignIn: React.FC<LoginProps> = ({ isOpen, setIsOpen }) => {
-  const theme = useTheme();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [error, setError] = React.useState<string | null>(null);
-  const navigate = useNavigate();
-
+export default function SignIn({ onAuthenticated, onSwitchToSignUp }: SignInProps) {
   const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    if (!login) {
-      showToast({ message: "Auth context not available", type: "error" });
+    if (!email || !password) {
+      setError("Please fill in all required fields.");
       return;
     }
+
+    setError(null);
+    setLoading(true);
 
     try {
       await login(email, password, AuthProviderType.LOCAL);
       showToast({ message: "Login successful", type: "success" });
-
-      handleClose();
-    } catch (error: any) {
-      console.error("Login error:", error);
+      onAuthenticated();
+    } catch (err: any) {
+      setError("Invalid credentials or server error.");
       showToast({
-        message: "Login failed: Invalid credentials or server error",
+        message: err?.response?.data?.message || "Login failed",
         type: "error",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-    setError(null);
-    setEmail("");
-    setPassword("");
-  };
-
   return (
-    <Container maxWidth="xs">
-      <Dialog
-        open={isOpen}
-        onClose={handleClose}
-        PaperProps={{
-          style: {
-            borderRadius: 20,
-            backgroundColor: theme.palette.background.paper,
-            color: theme.palette.text.primary,
-          },
+    <Box component="form" onSubmit={handleSubmit} sx={{ px: 3, pb: 3 }}>
+      <SocialLogins
+        onGoogle={() =>
+          showToast({ message: "Google sign-in is not implemented yet.", type: "info" })
+        }
+        onFeide={() =>
+          showToast({ message: "Feide sign-in is not implemented yet.", type: "info" })
+        }
+      />
+
+      <TextField
+        label="Email Address"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        fullWidth
+        required
+        size="small"
+        margin="dense"
+        autoComplete="email"
+      />
+
+      <TextField
+        label="Password"
+        type={showPassword ? "text" : "password"}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        fullWidth
+        required
+        size="small"
+        margin="dense"
+        autoComplete="current-password"
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                onClick={() => setShowPassword((s) => !s)}
+                edge="end"
+                size="small"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+              </IconButton>
+            </InputAdornment>
+          ),
         }}
+      />
+
+      {error && (
+        <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+          {error}
+        </Typography>
+      )}
+
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        color="secondary"
+        disabled={loading}
+        sx={{ mt: 2.5, py: 1.2, fontWeight: 700, textTransform: "none" }}
       >
+        {loading ? <CircularProgress size={22} /> : "Sign In"}
+      </Button>
+
+      <Typography variant="body2" sx={{ textAlign: "center", mt: 2, color: "text.secondary" }}>
+        {"Don't have an account? "}
         <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
+          component="span"
+          onClick={onSwitchToSignUp}
           sx={{
-            padding: 3,
-            backgroundColor: theme.palette.background.paper,
+            color: "primary.main",
+            fontWeight: 600,
+            cursor: "pointer",
+            "&:hover": { textDecoration: "underline" },
           }}
         >
-          <DialogTitle sx={{ color: theme.palette.text.primary }}>
-            Login
-          </DialogTitle>
-          <DialogContent>
-            <form onSubmit={handleSubmit}>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                label="Email Address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                label="Password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-
-              {error && (
-                <Typography color="error" variant="body2" mt={1}>
-                  {error}
-                </Typography>
-              )}
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{
-                  mt: 3,
-                  mb: 2,
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? theme.palette.primary.dark
-                      : theme.palette.primary.main,
-                  "&:hover": {
-                    backgroundColor:
-                      theme.palette.mode === "dark"
-                        ? theme.palette.primary.light
-                        : theme.palette.primary.dark,
-                  },
-                }}
-              >
-                Login
-              </Button>
-
-              <Button
-                fullWidth
-                variant="text"
-                color="secondary"
-                onClick={() => {
-                  navigate("/sign-up");
-                  setIsOpen(false);
-                }}
-              >
-                Don't have an account? Sign Up
-              </Button>
-            </form>
-          </DialogContent>
+          Sign Up
         </Box>
-      </Dialog>
-    </Container>
+      </Typography>
+    </Box>
   );
-};
+}
