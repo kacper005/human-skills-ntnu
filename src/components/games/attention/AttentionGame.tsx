@@ -21,6 +21,10 @@ import {
   GameOverScreen,
   GameHeader,
 } from "../../organisms";
+import { useAuth } from "@hooks/useAuth";
+import { showToast } from "@atoms/Toast";
+import { addGameSession } from "@api/gameSession";
+import { getAllGameTemplates } from "@api/gameTemplate";
 
 interface AttentionGameProps {
   onBack?: () => void;
@@ -28,37 +32,103 @@ interface AttentionGameProps {
 
 export function AttentionGame({ onBack }: AttentionGameProps) {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+
   const game = useAttentionGameController();
+  const { startGame, stopGame } = game;
+
+  const startedAtRef = React.useRef<number>(Date.now());
+  const persistedRef = React.useRef(false);
+
+  const resetAndStart = React.useCallback(() => {
+    startedAtRef.current = Date.now();
+    persistedRef.current = false;
+    startGame();
+  }, [startGame]);
 
   const handleBack = React.useCallback(() => {
     if (onBack) {
       onBack();
     } else {
-      navigate("/home")
+      navigate("/home");
     }
-  }, [navigate]);
+  }, [navigate, onBack]);
 
   React.useEffect(() => {
     document.body.style.overflow = "hidden";
-    
     return () => {
       document.body.style.overflow = "auto";
     };
   }, []);
 
   React.useEffect(() => {
-    game.startGame();
-    
+    resetAndStart();
     return () => {
-      game.stopGame();
+      stopGame();
     };
-  }, []);
+  }, [resetAndStart, stopGame]);
+
+  React.useEffect(() => {
+    if (!game.isGameOver || persistedRef.current) return;
+    persistedRef.current = true;
+
+    if (!isLoggedIn) return;
+
+    const persistSession = async () => {
+      try {
+        const templatesResponse = await getAllGameTemplates();
+        const templates = templatesResponse.data || [];
+
+        console.log("templates", templatesResponse.data);
+
+        const attentionTemplate = templates.find(
+          (t) => String(t.gameType).toUpperCase() === "ATTENTION"
+        );
+
+        if (!attentionTemplate) {
+          showToast({
+            message: "Attention template not found, could not save session.",
+            type: "warning",
+          });
+          return;
+        }
+
+        await addGameSession({
+          gameTemplateId: attentionTemplate.id,
+          startTime: new Date(startedAtRef.current).toISOString(),
+          endTime: new Date().toISOString(),
+          score: game.score,
+          accuracy: game.accuracy,
+          metadata: {
+            totalAnswers: game.totalAnswers,
+          },
+        });
+
+        showToast({ message: "Game session saved.", type: "success" });
+      } catch (error: any) {
+        console.error("Failed to save attention game session:", error);
+        showToast({
+          message:
+            error?.response?.data?.message || "Failed to save game session",
+          type: "error",
+        });
+      }
+    };
+
+    persistSession();
+  }, [
+    game.isGameOver,
+    game.score,
+    game.accuracy,
+    game.totalAnswers,
+    isLoggedIn,
+  ]);
 
   if (game.isGameOver) {
     return (
       <>
         <GameHeader onBack={handleBack} />
-        <GameOverScreen onPlayAgain={game.startGame} onHome={handleBack}>
+        <GameOverScreen onPlayAgain={resetAndStart} onHome={handleBack}>
           <p style={{ fontSize: "1.5rem", fontWeight: "600", color: "#334155" }}>
             Score: <span style={{ color: "#ea580c" }}>{game.score}</span> / {game.totalAnswers}
           </p>
@@ -72,17 +142,19 @@ export function AttentionGame({ onBack }: AttentionGameProps) {
   }
 
   return (
-    <div style={{ 
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      overflow: "hidden",
-      background: "#e0dcf19d"
-    }}>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        overflow: "hidden",
+        background: "#e0dcf19d",
+      }}
+    >
       <GameHeader onBack={handleBack} />
-      
+
       <div
         style={{
           height: "100vh",
@@ -117,7 +189,7 @@ export function AttentionGame({ onBack }: AttentionGameProps) {
             <SpaceBackground starCount={50} />
 
             <StatsContainer>
-              <StatsBox label="Time" value={`${game.timeLeft}s`} width="90px" />
+              <StatsBox label="Time" value={game.timeLeft + "s"} width="90px" />
               <StatsBox label="Score" value={game.score} width="90px" />
               <StatsBox
                 label="Multiplier"
@@ -135,11 +207,12 @@ export function AttentionGame({ onBack }: AttentionGameProps) {
 
             <Countdown value={game.countdown} variant="dark" />
 
-            {game.isPaused && game.countdown === 0 && <PauseOverlay onResume={game.togglePause} />}
+            {game.isPaused && game.countdown === 0 && (
+              <PauseOverlay onResume={game.togglePause} />
+            )}
 
             {game.countdown === 0 && !game.isPaused && (
               <div style={{ position: "absolute", inset: 0 }}>
-                {/* Shuttles */}
                 {game.shuttles.map((shuttle, index) => (
                   <ShuttleSprite
                     key={index}
