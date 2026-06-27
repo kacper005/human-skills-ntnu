@@ -19,6 +19,7 @@ import { NotFound } from "@pages/NotFound";
 import { Admin } from "@pages/Admin/Admin";
 import { UserProfile } from "@pages/UserProfile";
 import { AdminUsers } from "@pages/Admin/AdminUsers";
+import { MyGameSessions } from "@pages/MyGameSessions";
 import { MyTestSessions } from "@pages/MyTestSessions";
 import { SharedSessions } from "@pages/SharedSessions";
 import { AdminTestTemplates } from "@pages/Admin/AdminTestTemplates";
@@ -84,6 +85,7 @@ export const App: React.FC = () => {
             <Route element={<ProtectedRoute />}>
               <Route path="/user-profile" element={<UserProfile />} />
               <Route path="/my-test-sessions" element={<MyTestSessions />} />
+              <Route path="/my-game-sessions" element={<MyGameSessions />} />
             </Route>
 
             {/* Shared Sessions restricted to Teacher role */}

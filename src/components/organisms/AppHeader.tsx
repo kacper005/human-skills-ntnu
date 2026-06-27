@@ -9,6 +9,7 @@ import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import { Avatar, Button, Divider, ListItemIcon, Typography } from "@mui/material";
 import {
   Login,
@@ -202,6 +203,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                       <QuizIcon fontSize="small" />
                     </ListItemIcon>
                     My Test Sessions
+                  </MenuItem>
+                  <MenuItem onClick={() => navigate("/my-game-sessions")}>
+                    <ListItemIcon>
+                      <SportsEsportsIcon fontSize="small" />
+                    </ListItemIcon>
+                    My Game Sessions
                   </MenuItem>
 
                   <Divider />
