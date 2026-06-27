@@ -25,47 +25,63 @@ import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import InboxIcon from "@mui/icons-material/Inbox";
-import {
-  getAllTestSessions,
-  TestSession,
-  updateTestSessionDescription,
-} from "@api/testSession";
 import { showToast } from "@atoms/Toast";
 import { LoadingSpinner } from "@atoms/LoadingSpinner";
-import { getTestTypeDisplayName } from "@enums/TestType";
+import {
+  GameTemplate,
+  getAllGameTemplates,
+  updateGameTemplateDescription,
+} from "@api/gameTemplate";
 
 const GAME_TYPE_STYLES: Record<string, { bg: string; color: string }> = {
-  Attention: { bg: "#ede9fe", color: "#7c3aed" },
-  Balloon: { bg: "#fce7f3", color: "#db2777" },
-  CogFlex: { bg: "#ecfdf5", color: "#059669" },
+  ATTENTION: { bg: "#ede9fe", color: "#7c3aed" },
+  BALLOON: { bg: "#fce7f3", color: "#db2777" },
+  COGFLEX: { bg: "#ecfdf5", color: "#059669" },
+  INT_FLUID: { bg: "#e0f2fe", color: "#0369a1" },
+};
+
+const formatGameType = (type?: string) => {
+  if (!type) return "-";
+  return type
+    .toLowerCase()
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+};
+
+const formatDate = (date?: string) => {
+  if (!date) return "-";
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime())
+    ? "-"
+    : parsed.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
 };
 
 export const AdminGameTemplates: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [sessions, setSessions] = useState<TestSession[]>([]);
+  const [templates, setTemplates] = useState<GameTemplate[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<TestSession | null>(
+  const [selectedTemplate, setSelectedTemplate] = useState<GameTemplate | null>(
     null
   );
   const [description, setDescription] = useState("");
 
-  const fetchAllSessions = async () => {
+  const fetchAllTemplates = async () => {
     try {
-      const res = await getAllTestSessions();
-      const items = Array.isArray(res)
-        ? res
-        : Array.isArray((res as any).data)
-          ? (res as any).data
-          : ((res as any).items ?? []);
-      setSessions(items);
+      const res = await getAllGameTemplates();
+      setTemplates(res.data || []);
     } catch (err: any) {
       showToast({
         message:
-          err?.response?.data?.message || "Failed to fetch test sessions",
+          err?.response?.data?.message || "Failed to fetch game templates",
         type: "error",
       });
     } finally {
@@ -74,38 +90,40 @@ export const AdminGameTemplates: React.FC = () => {
   };
 
   React.useEffect(() => {
-    fetchAllSessions();
+    fetchAllTemplates();
   }, []);
 
-  const filtered = sessions.filter((s) => {
-    const name = (s as any).name || "";
-    const gameType = (s as any).gameType || "";
-    return (
-      name.toLowerCase().includes(search.toLowerCase()) ||
-      gameType.toLowerCase().includes(search.toLowerCase())
-    );
+  const filtered = templates.filter((template) => {
+    const name = (template.name || "").toLowerCase();
+    const gameType = String(template.gameType || "").toLowerCase();
+    const query = search.toLowerCase();
+
+    return name.includes(query) || gameType.includes(query);
   });
 
-  const openEditDialog = (session: TestSession) => {
-    setSelectedSession(session);
-    setDescription(
-      (session as any).description || (session as any).notes || ""
-    );
+  const openEditDialog = (template: GameTemplate) => {
+    setSelectedTemplate(template);
+    setDescription(template.description || "");
     setDialogOpen(true);
   };
 
   const handleSave = async () => {
-    if (!selectedSession) return;
+    if (!selectedTemplate) return;
+
     try {
-      await updateTestSessionDescription(selectedSession.id, description);
+      await updateGameTemplateDescription(selectedTemplate.id, description);
       showToast({
-        message: "Test session updated successfully!",
+        message: "Game template updated successfully!",
         type: "success",
       });
       setDialogOpen(false);
-      fetchAllSessions();
+      fetchAllTemplates();
     } catch (err: any) {
-      showToast({ message: "Failed to update test session", type: "error" });
+      showToast({
+        message:
+          err?.response?.data?.message || "Failed to update game template",
+        type: "error",
+      });
     }
   };
 
@@ -113,7 +131,6 @@ export const AdminGameTemplates: React.FC = () => {
 
   return (
     <Box>
-      {/* Page Header */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
           <Box
@@ -131,23 +148,19 @@ export const AdminGameTemplates: React.FC = () => {
             <SportsEsportsIcon sx={{ fontSize: 28 }} />
           </Box>
           <Box>
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: 700, color: "#1e293b" }}
-            >
+            <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b" }}>
               Game Templates
             </Typography>
             <Typography variant="body2" sx={{ color: "#64748b" }}>
-              View cognitive game sessions and configurations
+              View and edit cognitive game templates
             </Typography>
           </Box>
         </Box>
       </Box>
 
-      {/* Actions Bar */}
       <Box sx={{ mb: 3 }}>
         <TextField
-          placeholder="Search games..."
+          placeholder="Search templates..."
           size="small"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -165,23 +178,22 @@ export const AdminGameTemplates: React.FC = () => {
         />
       </Box>
 
-      {/* Table */}
       <Card sx={{ borderRadius: 3, overflow: "hidden" }}>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: "#f8fafc" }}>
                 <TableCell sx={{ fontWeight: 700, color: "#475569" }}>
-                  Session Name
+                  Template Name
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: "#475569" }}>
                   Game Type
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: "#475569" }}>
-                  Status
+                  Active
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: "#475569" }}>
-                  Started At
+                  Updated At
                 </TableCell>
                 <TableCell
                   sx={{ fontWeight: 700, color: "#475569" }}
@@ -191,6 +203,7 @@ export const AdminGameTemplates: React.FC = () => {
                 </TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
@@ -212,16 +225,18 @@ export const AdminGameTemplates: React.FC = () => {
               ) : (
                 filtered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((session) => {
-                    const name = (session as any).name || `Session #${session.id}`;
-                    const gameType = (session as any).gameType
-                      ? getTestTypeDisplayName((session as any).gameType)
-                      : "-";
-                    const status = (session as any).status || "-";
-                    const startedAt = session.startTime;
+                  .map((template) => {
+                    const gameTypeRaw = String(template.gameType || "");
+                    const gameTypeLabel = formatGameType(gameTypeRaw);
+                    const style =
+                      GAME_TYPE_STYLES[gameTypeRaw.toUpperCase()] || {
+                        bg: "#f1f5f9",
+                        color: "#475569",
+                      };
+
                     return (
                       <TableRow
-                        key={session.id}
+                        key={template.id}
                         sx={{
                           "&:hover": { bgcolor: "#fafafa" },
                           transition: "background-color 0.15s",
@@ -232,59 +247,47 @@ export const AdminGameTemplates: React.FC = () => {
                             variant="body2"
                             sx={{ fontWeight: 600, color: "#1e293b" }}
                           >
-                            {name}
+                            {template.name || "Template #" + template.id}
                           </Typography>
                         </TableCell>
+
                         <TableCell>
                           <Chip
-                            label={gameType}
+                            label={gameTypeLabel}
                             size="small"
                             sx={{
-                              bgcolor:
-                                GAME_TYPE_STYLES[gameType]?.bg || "#f1f5f9",
-                              color:
-                                GAME_TYPE_STYLES[gameType]?.color || "#475569",
+                              bgcolor: style.bg,
+                              color: style.color,
                               fontWeight: 600,
                               fontSize: "0.75rem",
                             }}
                           />
                         </TableCell>
+
                         <TableCell>
                           <Chip
-                            label={status}
+                            label={template.active ? "Active" : "Inactive"}
                             size="small"
                             sx={{
-                              bgcolor:
-                                status === "active" ? "#f0fdf4" : "#f1f5f9",
-                              color:
-                                status === "active" ? "#16a34a" : "#64748b",
+                              bgcolor: template.active ? "#f0fdf4" : "#f1f5f9",
+                              color: template.active ? "#16a34a" : "#64748b",
                               fontWeight: 600,
                               fontSize: "0.75rem",
                             }}
                           />
                         </TableCell>
+
                         <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ color: "#64748b" }}
-                          >
-                            {startedAt
-                              ? new Date(startedAt).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  }
-                                )
-                              : "-"}
+                          <Typography variant="body2" sx={{ color: "#64748b" }}>
+                            {formatDate(template.updatedAt || template.createdAt)}
                           </Typography>
                         </TableCell>
+
                         <TableCell align="right">
                           <Tooltip title="Edit description">
                             <IconButton
                               size="small"
-                              onClick={() => openEditDialog(session)}
+                              onClick={() => openEditDialog(template)}
                               sx={{
                                 color: "#64748b",
                                 "&:hover": { color: "#22c55e" },
@@ -301,6 +304,7 @@ export const AdminGameTemplates: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
@@ -316,9 +320,8 @@ export const AdminGameTemplates: React.FC = () => {
         />
       </Card>
 
-      {/* Edit Description Dialog */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>Edit Session Description</DialogTitle>
+        <DialogTitle>Edit Template Description</DialogTitle>
         <DialogContent>
           <TextField
             label="Description"
