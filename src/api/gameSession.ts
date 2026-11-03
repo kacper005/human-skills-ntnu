@@ -1,39 +1,27 @@
 import { axiosInstance } from "./axiosInstance";
+import { GameType } from "@enums/GameType";
 
 const BASE_URL = "/gamesessions";
+
+// Game-specific result values, e.g. { points: 120, accuracy: 85 }
+export type GameSessionScore = Record<string, unknown>;
 
 export interface AddGameSessionRequest {
   gameTemplateId: number;
   startTime: string;
   endTime: string;
-  score?: number;
-  accuracy?: number;
-  metadata?: Record<string, unknown>;
+  score: GameSessionScore;
 }
 
 export interface GameSession {
   id: number;
-  userId?: number;
-  gameTemplateId?: number;
-  startTime?: string;
-  endTime?: string;
-  score?: number;
-  accuracy?: number;
-  metadata?: Record<string, unknown>;
-  createdAt?: string;
-}
-
-export interface GameSessionReply {
-  id: number;
   userId: number;
   gameTemplateId: number;
-  gameType?: string;
-  gameName?: string;
+  gameType: GameType;
+  gameName: string;
   startTime: string;
   endTime: string;
-  score?: number;
-  accuracy?: number;
-  metadata?: Record<string, unknown>;
+  score: GameSessionScore | null;
 }
 
 export const getAllGameSessionsForCurrentUser = () =>
@@ -43,7 +31,7 @@ export const addGameSession = (payload: AddGameSessionRequest) =>
   axiosInstance.post<string>(BASE_URL + "/add", payload);
 
 export const getGameSessionById = (id: number) =>
-  axiosInstance.get<GameSessionReply>(BASE_URL + "/" + id);
+  axiosInstance.get<GameSession>(BASE_URL + "/" + id);
 
 export const deleteGameSession = (id: number) =>
   axiosInstance.delete<string>(BASE_URL + "/delete/" + id);
