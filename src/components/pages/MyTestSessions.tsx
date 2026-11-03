@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography } from "@mui/material";
+import { Button, Card, Typography } from "@mui/material";
 import {
   deleteTestSession,
   getAllTestSessionsFormatted,
@@ -37,6 +37,7 @@ const columns: {
 
 export const MyTestSessions: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
+  const [loadFailed, setLoadFailed] = React.useState(false);
   const [testSessions, setTestSessions] = React.useState<TestSessionView[]>([]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
@@ -51,8 +52,7 @@ export const MyTestSessions: React.FC = () => {
     try {
       const response = await getTestSessionFormattedById(row.id);
       setSelectedSession(response.data);
-    } catch (error) {
-      console.error("Failed to fetch session details", error);
+    } catch {
       showToast({ message: "Could not load session details", type: "error" });
       setDialogOpen(false);
     } finally {
@@ -77,22 +77,22 @@ export const MyTestSessions: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  React.useEffect(() => {
-    const fetchAllTestSessions = async () => {
-      try {
-        const response = await getAllTestSessionsFormatted();
-        console.log("Fetched test sessions:", response.data);
-        setTestSessions(response.data || []);
-      } catch (error) {
-        console.error("Error fetching test sessions:", error);
-        showToast({ message: "Failed to fetch test sessions", type: "error" });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllTestSessions();
+  const fetchAllTestSessions = React.useCallback(async () => {
+    setLoading(true);
+    setLoadFailed(false);
+    try {
+      const response = await getAllTestSessionsFormatted();
+      setTestSessions(response.data || []);
+    } catch {
+      setLoadFailed(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  React.useEffect(() => {
+    fetchAllTestSessions();
+  }, [fetchAllTestSessions]);
 
   const confirmAndDelete = async () => {
     if (!selectedSession) return;
@@ -104,8 +104,7 @@ export const MyTestSessions: React.FC = () => {
         prev.filter((s) => s.id !== selectedSession.id)
       );
       handleCloseDialog();
-    } catch (error) {
-      console.error("Delete failed", error);
+    } catch {
       showToast({ message: "Failed to delete session", type: "error" });
     } finally {
       setConfirmDialogOpen(false);
@@ -127,11 +126,23 @@ export const MyTestSessions: React.FC = () => {
       <Typography variant="h2" gutterBottom>
         My Test Sessions
       </Typography>
-      <GenericTable
-        columns={columns}
-        rows={testSessions}
-        onRowClick={handleRowClick}
-      />
+      {loadFailed ? (
+        <Card sx={{ borderRadius: 3, p: 4, textAlign: "center" }}>
+          <Typography sx={{ mb: 2, color: "#64748b" }}>
+            Could not load your test sessions.
+          </Typography>
+          <Button variant="contained" onClick={fetchAllTestSessions}>
+            Try again
+          </Button>
+        </Card>
+      ) : (
+        <GenericTable
+          columns={columns}
+          rows={testSessions}
+          onRowClick={handleRowClick}
+          emptyMessage="You have not taken any tests yet."
+        />
+      )}
 
       <SessionDetailsDialog
         dialogOpen={dialogOpen}
