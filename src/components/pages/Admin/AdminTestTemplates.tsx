@@ -42,6 +42,7 @@ const OPTION_TYPE_STYLES: Record<string, { bg: string; color: string }> = {
 
 export const AdminTestTemplates: React.FC = () => {
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [testTemplates, setTestTemplates] = useState<TestTemplate[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
@@ -52,23 +53,21 @@ export const AdminTestTemplates: React.FC = () => {
     useState<TestTemplate | null>(null);
   const [description, setDescription] = useState("");
 
-  const fetchAllTestTemplates = async () => {
+  const fetchAllTestTemplates = React.useCallback(async () => {
+    setLoadFailed(false);
     try {
       const response = await getAllTestTemplates();
       setTestTemplates(response.data || []);
-    } catch (err: any) {
-      showToast({
-        message: err.response?.data?.message || "Failed to fetch test data",
-        type: "error",
-      });
+    } catch {
+      setLoadFailed(true);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   React.useEffect(() => {
     fetchAllTestTemplates();
-  }, []);
+  }, [fetchAllTestTemplates]);
 
   const filtered = testTemplates.filter(
     (t) =>
@@ -98,12 +97,25 @@ export const AdminTestTemplates: React.FC = () => {
       }
       setDialogOpen(false);
       fetchAllTestTemplates();
-    } catch (error) {
+    } catch {
       showToast({ message: "Failed to update test template", type: "error" });
     }
   };
 
   if (loading) return <LoadingSpinner />;
+
+  if (loadFailed) {
+    return (
+      <Card sx={{ borderRadius: 3, p: 4, textAlign: "center" }}>
+        <Typography sx={{ mb: 2, color: "#64748b" }}>
+          Could not load test templates.
+        </Typography>
+        <Button variant="contained" onClick={fetchAllTestTemplates}>
+          Try again
+        </Button>
+      </Card>
+    );
+  }
 
   return (
     <Box>
@@ -303,7 +315,11 @@ export const AdminTestTemplates: React.FC = () => {
           <Button variant="outlined" onClick={() => setDialogOpen(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSave} variant="contained">
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            disabled={!description.trim()}
+          >
             Save
           </Button>
         </DialogActions>
