@@ -1,17 +1,14 @@
 import { axiosInstance } from './axiosInstance';
+import { GameType } from "@enums/GameType";
 
 const BASE_URL = '/game';
-
-export type GameType = "ATTENTION" | "BALLOON" | "COGFLEX" | string;
 
 export interface GameTemplate {
   id: number;
   gameType: GameType;
-  name?: string;
-  description?: string;
-  active?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  name: string;
+  description: string | null;
+  active: boolean;
 }
 
 export interface CreateGameTemplateRequest {
@@ -29,6 +26,9 @@ export const getAllActiveGameTemplates = () =>
 
 export const getGameTemplateById = (id: number) =>
   axiosInstance.get<GameTemplate>(BASE_URL + `/get/${id}`);
+
+export const getGameTemplateByType = (gameType: GameType) =>
+  axiosInstance.get<GameTemplate>(BASE_URL + `/get-by-game-type/${gameType}`);
 
 export const addGameTemplate = (payload: CreateGameTemplateRequest) =>
   axiosInstance.post<number>(BASE_URL + "/add", payload);
