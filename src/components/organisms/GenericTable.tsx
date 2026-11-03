@@ -24,6 +24,7 @@ interface GenericTableProps<T> {
   rowsPerPageOptions?: number[];
   onRowClick?: (row: T) => void;
   rowKey?: (row: T) => string;
+  emptyMessage?: string;
 }
 
 export function GenericTable<T extends { id: string | number }>({
@@ -32,6 +33,7 @@ export function GenericTable<T extends { id: string | number }>({
   rowsPerPageOptions = [10, 25, 100],
   onRowClick,
   rowKey,
+  emptyMessage = "No data found",
 }: GenericTableProps<T>) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(rowsPerPageOptions[0]);
@@ -70,7 +72,7 @@ export function GenericTable<T extends { id: string | number }>({
             {rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length} align="center">
-                  No data found
+                  {emptyMessage}
                 </TableCell>
               </TableRow>
             ) : (
