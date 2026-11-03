@@ -20,6 +20,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Switch,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
@@ -30,39 +31,20 @@ import { LoadingSpinner } from "@atoms/LoadingSpinner";
 import {
   GameTemplate,
   getAllGameTemplates,
+  setGameTemplateActive,
   updateGameTemplateDescription,
 } from "@api/gameTemplate";
+import { GameType, getGameTypeDisplayName } from "@enums/GameType";
 
-const GAME_TYPE_STYLES: Record<string, { bg: string; color: string }> = {
-  ATTENTION: { bg: "#ede9fe", color: "#7c3aed" },
-  BALLOON: { bg: "#fce7f3", color: "#db2777" },
-  COGFLEX: { bg: "#ecfdf5", color: "#059669" },
-  INT_FLUID: { bg: "#e0f2fe", color: "#0369a1" },
-};
-
-const formatGameType = (type?: string) => {
-  if (!type) return "-";
-  return type
-    .toLowerCase()
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-};
-
-const formatDate = (date?: string) => {
-  if (!date) return "-";
-  const parsed = new Date(date);
-  return Number.isNaN(parsed.getTime())
-    ? "-"
-    : parsed.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+const GAME_TYPE_STYLES: Record<GameType, { bg: string; color: string }> = {
+  [GameType.ATTENTION]: { bg: "#ede9fe", color: "#7c3aed" },
+  [GameType.BALLOON]: { bg: "#fce7f3", color: "#db2777" },
+  [GameType.COGFLEX]: { bg: "#ecfdf5", color: "#059669" },
 };
 
 export const AdminGameTemplates: React.FC = () => {
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [templates, setTemplates] = useState<GameTemplate[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
@@ -74,32 +56,42 @@ export const AdminGameTemplates: React.FC = () => {
   );
   const [description, setDescription] = useState("");
 
-  const fetchAllTemplates = async () => {
+  const fetchAllTemplates = React.useCallback(async () => {
+    setLoadFailed(false);
     try {
       const res = await getAllGameTemplates();
       setTemplates(res.data || []);
-    } catch (err: any) {
-      showToast({
-        message:
-          err?.response?.data?.message || "Failed to fetch game templates",
-        type: "error",
-      });
+    } catch {
+      setLoadFailed(true);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   React.useEffect(() => {
     fetchAllTemplates();
-  }, []);
+  }, [fetchAllTemplates]);
 
   const filtered = templates.filter((template) => {
-    const name = (template.name || "").toLowerCase();
-    const gameType = String(template.gameType || "").toLowerCase();
+    const name = template.name.toLowerCase();
+    const gameType = getGameTypeDisplayName(template.gameType).toLowerCase();
     const query = search.toLowerCase();
 
     return name.includes(query) || gameType.includes(query);
   });
+
+  const handleToggleActive = async (template: GameTemplate) => {
+    try {
+      await setGameTemplateActive(template.id, !template.active);
+      setTemplates((prev) =>
+        prev.map((t) =>
+          t.id === template.id ? { ...t, active: !template.active } : t
+        )
+      );
+    } catch {
+      showToast({ message: "Failed to update game template", type: "error" });
+    }
+  };
 
   const openEditDialog = (template: GameTemplate) => {
     setSelectedTemplate(template);
@@ -118,16 +110,25 @@ export const AdminGameTemplates: React.FC = () => {
       });
       setDialogOpen(false);
       fetchAllTemplates();
-    } catch (err: any) {
-      showToast({
-        message:
-          err?.response?.data?.message || "Failed to update game template",
-        type: "error",
-      });
+    } catch {
+      showToast({ message: "Failed to update game template", type: "error" });
     }
   };
 
   if (loading) return <LoadingSpinner />;
+
+  if (loadFailed) {
+    return (
+      <Card sx={{ borderRadius: 3, p: 4, textAlign: "center" }}>
+        <Typography sx={{ mb: 2, color: "#64748b" }}>
+          Could not load game templates.
+        </Typography>
+        <Button variant="contained" onClick={fetchAllTemplates}>
+          Try again
+        </Button>
+      </Card>
+    );
+  }
 
   return (
     <Box>
@@ -190,10 +191,10 @@ export const AdminGameTemplates: React.FC = () => {
                   Game Type
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: "#475569" }}>
-                  Active
+                  Description
                 </TableCell>
                 <TableCell sx={{ fontWeight: 700, color: "#475569" }}>
-                  Updated At
+                  Active
                 </TableCell>
                 <TableCell
                   sx={{ fontWeight: 700, color: "#475569" }}
@@ -226,13 +227,11 @@ export const AdminGameTemplates: React.FC = () => {
                 filtered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((template) => {
-                    const gameTypeRaw = String(template.gameType || "");
-                    const gameTypeLabel = formatGameType(gameTypeRaw);
-                    const style =
-                      GAME_TYPE_STYLES[gameTypeRaw.toUpperCase()] || {
-                        bg: "#f1f5f9",
-                        color: "#475569",
-                      };
+                    const gameTypeLabel = getGameTypeDisplayName(template.gameType);
+                    const style = GAME_TYPE_STYLES[template.gameType] || {
+                      bg: "#f1f5f9",
+                      color: "#475569",
+                    };
 
                     return (
                       <TableRow
@@ -247,7 +246,7 @@ export const AdminGameTemplates: React.FC = () => {
                             variant="body2"
                             sx={{ fontWeight: 600, color: "#1e293b" }}
                           >
-                            {template.name || "Template #" + template.id}
+                            {template.name}
                           </Typography>
                         </TableCell>
 
@@ -265,22 +264,22 @@ export const AdminGameTemplates: React.FC = () => {
                         </TableCell>
 
                         <TableCell>
-                          <Chip
-                            label={template.active ? "Active" : "Inactive"}
-                            size="small"
-                            sx={{
-                              bgcolor: template.active ? "#f0fdf4" : "#f1f5f9",
-                              color: template.active ? "#16a34a" : "#64748b",
-                              fontWeight: 600,
-                              fontSize: "0.75rem",
-                            }}
-                          />
+                          <Typography variant="body2" sx={{ color: "#64748b" }}>
+                            {template.description || "-"}
+                          </Typography>
                         </TableCell>
 
                         <TableCell>
-                          <Typography variant="body2" sx={{ color: "#64748b" }}>
-                            {formatDate(template.updatedAt || template.createdAt)}
-                          </Typography>
+                          <Tooltip
+                            title={template.active ? "Deactivate" : "Activate"}
+                          >
+                            <Switch
+                              size="small"
+                              color="success"
+                              checked={template.active}
+                              onChange={() => handleToggleActive(template)}
+                            />
+                          </Tooltip>
                         </TableCell>
 
                         <TableCell align="right">
