@@ -17,7 +17,7 @@ interface AuthContextType {
     password: string,
     authProvider: AuthProviderType.LOCAL
   ) => Promise<void>;
-  loginWithGoogle: (credentialId: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -88,10 +88,10 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
     }
   };
 
-  const loginWithGoogle = async (credentialId: string) => {
+  const loginWithGoogle = async (idToken: string) => {
     try {
       const response = await axiosInstance.post("/authenticate", {
-        credentialId,
+        idToken,
         authProvider: "GOOGLE",
       });
 
@@ -100,7 +100,6 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
       axiosInstance.defaults.headers.Authorization = `Bearer ${token}`;
       await fetchUser();
     } catch (error) {
-      console.error("Google login failed", error);
       logout();
       throw error;
     }

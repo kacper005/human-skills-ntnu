@@ -35,7 +35,8 @@
       "@api/*": ["src/api/*"],
       "@context/*": ["src/context/*"],
       "@enums/*": ["src/enums/*"],
-      "@formatters/*": ["src/formatters/*"]
+      "@formatters/*": ["src/formatters/*"],
+      "@types/*": ["src/types/*.d.ts"]
     }
   },
   "include": ["src"]
