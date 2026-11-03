@@ -24,7 +24,8 @@ import {
 import { useAuth } from "@hooks/useAuth";
 import { showToast } from "@atoms/Toast";
 import { addGameSession } from "@api/gameSession";
-import { getAllGameTemplates } from "@api/gameTemplate";
+import { getGameTemplateByType } from "@api/gameTemplate";
+import { GameType } from "@enums/GameType";
 
 interface AttentionGameProps {
   onBack?: () => void;
@@ -76,42 +77,22 @@ export function AttentionGame({ onBack }: AttentionGameProps) {
 
     const persistSession = async () => {
       try {
-        const templatesResponse = await getAllGameTemplates();
-        const templates = templatesResponse.data || [];
-
-        console.log("templates", templatesResponse.data);
-
-        const attentionTemplate = templates.find(
-          (t) => String(t.gameType).toUpperCase() === "ATTENTION"
-        );
-
-        if (!attentionTemplate) {
-          showToast({
-            message: "Attention template not found, could not save session.",
-            type: "warning",
-          });
-          return;
-        }
+        const templateResponse = await getGameTemplateByType(GameType.ATTENTION);
 
         await addGameSession({
-          gameTemplateId: attentionTemplate.id,
+          gameTemplateId: templateResponse.data.id,
           startTime: new Date(startedAtRef.current).toISOString(),
           endTime: new Date().toISOString(),
-          score: game.score,
-          accuracy: game.accuracy,
-          metadata: {
+          score: {
+            points: game.score,
+            accuracy: game.accuracy,
             totalAnswers: game.totalAnswers,
           },
         });
 
         showToast({ message: "Game session saved.", type: "success" });
-      } catch (error: any) {
-        console.error("Failed to save attention game session:", error);
-        showToast({
-          message:
-            error?.response?.data?.message || "Failed to save game session",
-          type: "error",
-        });
+      } catch {
+        showToast({ message: "Failed to save game session", type: "error" });
       }
     };
 
