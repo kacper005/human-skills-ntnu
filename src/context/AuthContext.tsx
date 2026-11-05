@@ -1,8 +1,11 @@
 import React from "react";
+import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { User, getUserMe } from "@api/userApi";
+import { User, createUser, getUserMe } from "@api/userApi";
 import { axiosInstance } from "@api/axiosInstance";
 import { AuthProvider as AuthProviderType } from "@enums/AuthProvider";
+import { Gender } from "@enums/Gender";
+import { Role } from "@enums/Role";
 
 export interface AuthContextProps {
   children: React.ReactNode;
@@ -88,14 +91,33 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
     }
   };
 
+  const authenticateWithGoogle = async (idToken: string) => {
+    const response = await axiosInstance.post<string>("/authenticate", {
+      idToken,
+      authProvider: AuthProviderType.GOOGLE,
+    });
+    return response.data;
+  };
+
   const loginWithGoogle = async (idToken: string) => {
     try {
-      const response = await axiosInstance.post("/authenticate", {
-        idToken,
-        authProvider: "GOOGLE",
-      });
+      let token: string;
+      try {
+        token = await authenticateWithGoogle(idToken);
+      } catch (error) {
+        if (!axios.isAxiosError(error) || error.response?.status !== 404) {
+          throw error;
+        }
+        // First Google sign-in: create a student account from the ID token
+        await createUser({
+          authProvider: AuthProviderType.GOOGLE,
+          idToken,
+          role: Role.STUDENT,
+          gender: Gender.UNIDENTIFIED,
+        });
+        token = await authenticateWithGoogle(idToken);
+      }
 
-      const token = response.data;
       localStorage.setItem("authToken", token);
       axiosInstance.defaults.headers.Authorization = `Bearer ${token}`;
       await fetchUser();
