@@ -1,28 +1,9 @@
 import React from "react";
-import { Box, Button, Typography, Divider } from "@mui/material";
-
-export function GoogleIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
-      <path
-        fill="#EA4335"
-        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-      />
-      <path
-        fill="#4285F4"
-        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-      />
-      <path
-        fill="#34A853"
-        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-      />
-    </svg>
-  );
-}
+import axios from "axios";
+import { Box, Button, Typography, Divider, CircularProgress } from "@mui/material";
+import { useAuth } from "@hooks/useAuth";
+import { showToast } from "@atoms/Toast";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 
 export function FeideIcon() {
   return (
@@ -45,31 +26,60 @@ export function FeideIcon() {
   );
 }
 
+const getGoogleLoginErrorMessage = (error: unknown) => {
+  if (axios.isAxiosError(error)) {
+    if (error.response?.status === 409) {
+      return "An account with this email already exists. Sign in with your email and password.";
+    }
+    if (error.response?.status === 400) {
+      return "Google could not verify your account. Please try again.";
+    }
+  }
+  return "Google sign-in is currently unavailable. Please try again later.";
+};
+
 interface SocialLoginsProps {
-  onGoogle: () => void;
+  onAuthenticated: () => void;
   onFeide: () => void;
 }
 
-export function SocialLogins({ onGoogle, onFeide }: SocialLoginsProps) {
+export function SocialLogins({ onAuthenticated, onFeide }: SocialLoginsProps) {
+  const { loginWithGoogle } = useAuth();
+  const [googleLoading, setGoogleLoading] = React.useState(false);
+  const [googleError, setGoogleError] = React.useState<string | null>(null);
+
+  const handleGoogleCredential = async (idToken: string) => {
+    setGoogleError(null);
+    setGoogleLoading(true);
+    try {
+      await loginWithGoogle(idToken);
+      showToast({ message: "Signed in with Google", type: "success" });
+      onAuthenticated();
+    } catch (error) {
+      setGoogleError(getGoogleLoginErrorMessage(error));
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-        <Button
-          fullWidth
-          variant="outlined"
-          startIcon={<GoogleIcon />}
-          onClick={onGoogle}
-          sx={{
-            textTransform: "none",
-            fontWeight: 600,
-            py: 1.1,
-            borderColor: "#dadce0",
-            color: "#3c4043",
-            "&:hover": { borderColor: "#c6c8cc", bgcolor: "#f8f9fa" },
-          }}
-        >
-          Continue with Google
-        </Button>
+        {/* Hidden instead of unmounted, so the Google button keeps its rendered state */}
+        <Box sx={{ display: googleLoading ? "none" : "block" }}>
+          <GoogleSignInButton onCredential={handleGoogleCredential} />
+        </Box>
+        {googleLoading && (
+          <Button
+            fullWidth
+            variant="outlined"
+            disabled
+            sx={{ textTransform: "none", fontWeight: 600, py: 1.1 }}
+          >
+            <CircularProgress size={20} sx={{ mr: 1.5 }} />
+            Signing in with Google...
+          </Button>
+        )}
         <Button
           fullWidth
           variant="outlined"
@@ -87,6 +97,12 @@ export function SocialLogins({ onGoogle, onFeide }: SocialLoginsProps) {
           Continue with Feide
         </Button>
       </Box>
+
+      {googleError && (
+        <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+          {googleError}
+        </Typography>
+      )}
 
       <Divider sx={{ my: 2.5, color: "text.secondary", fontSize: 13 }}>or</Divider>
     </>
