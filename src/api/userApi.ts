@@ -17,13 +17,14 @@ export interface User {
   createdAt: string;
 }
 
+// Name, email and password are taken from the ID token for Google and Feide sign-up
 export interface CreateUserDto {
   authProvider: AuthProvider;
   idToken?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
   gender: Gender;
   role?: Role;
 }
