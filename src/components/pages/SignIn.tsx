@@ -57,9 +57,7 @@ export default function SignIn({ onAuthenticated, onSwitchToSignUp }: SignInProp
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ px: 3, pb: 3, overflowY: "scroll" }}>
       <SocialLogins
-        onGoogle={() =>
-          showToast({ message: "Google sign-in is not implemented yet.", type: "info" })
-        }
+        onAuthenticated={onAuthenticated}
         onFeide={() =>
           showToast({ message: "Feide sign-in is not implemented yet.", type: "info" })
         }
